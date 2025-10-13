@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -8,7 +9,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -24,9 +26,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    // Navigate to login after 2 seconds
-    Future.delayed(const Duration(seconds: 5), () {
-      context.go('/login');
+    // After animation, decide route based on session
+    Future.delayed(const Duration(seconds: 2), () {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (!mounted) return;
+      if (session != null) {
+        context.go('/home');
+      } else {
+        context.go('/login');
+      }
     });
   }
 
@@ -44,9 +52,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         child: FadeTransition(
           opacity: _animation,
           child: Image.asset(
-            '../../assets/logo.png',
-            width: 512,
-            height: 512,
+            'assets/logo.png',
+            width: 200,
+            height: 200,
+            errorBuilder: (_, __, ___) {
+              return const Icon(
+                Icons.medical_services,
+                size: 96,
+                color: Colors.indigo,
+              );
+            },
           ),
         ),
       ),

@@ -7,3 +7,11 @@ final authStateProvider = StreamProvider<AuthState?>((ref) {
   final supabase = ref.watch(supabaseClientProvider);
   return supabase.auth.onAuthStateChange.map((event) => event);
 });
+
+final sessionProvider = Provider<Session?>(
+  (ref) => Supabase.instance.client.auth.currentSession,
+);
+
+final isLoggedInProvider = Provider<bool>(
+  (ref) => ref.watch(sessionProvider) != null,
+);
