@@ -6,7 +6,6 @@ class PatientShell extends StatelessWidget {
   const PatientShell({super.key, required this.navigationShell});
 
   void _goBranch(int index) {
-    // Navigate to the specified branch and keep the current branch's state.
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,

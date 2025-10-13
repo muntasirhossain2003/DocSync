@@ -3,16 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../features/ai_assistant/presentation/pages/ai_assistant_page.dart';
 import '../../features/auth /presentation/pages/log_in.dart';
 import '../../features/auth /presentation/pages/register.dart';
 import '../../features/auth /presentation/provider/auth_provider.dart';
-import '../../features/patient/presentation/pages/ai_assistant_page.dart';
-import '../../features/patient/presentation/pages/consult_page.dart';
-import '../../features/patient/presentation/pages/health_page.dart';
-import '../../features/patient/presentation/pages/home_page.dart';
-import '../../features/patient/presentation/pages/profile_page.dart';
-import '../../features/patient/presentation/widgets/patient_shell.dart';
+import '../../features/consult/presentation/pages/consult_page.dart';
+import '../../features/health/presentation/pages/health_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../shared/widgets/splash_screen.dart';
+import '../widgets/patient_shell.dart';
 
 class _AuthRefresh extends ChangeNotifier {
   _AuthRefresh() {

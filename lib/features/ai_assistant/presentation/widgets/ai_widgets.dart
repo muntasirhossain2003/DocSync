@@ -1,37 +1,10 @@
+// lib/features/ai_assistant/presentation/widgets/ai_widgets.dart
 import 'package:flutter/material.dart';
 
-class AIAssistantPage extends StatelessWidget {
-  const AIAssistantPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('AI Assistant')),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: const [
-                _ChatBubble(
-                  text: 'Hello! Describe your symptoms.',
-                  isMe: false,
-                ),
-              ],
-            ),
-          ),
-          const _SuggestedCard(),
-          const _ChatInput(),
-        ],
-      ),
-    );
-  }
-}
-
-class _ChatBubble extends StatelessWidget {
+class ChatBubble extends StatelessWidget {
   final String text;
   final bool isMe;
-  const _ChatBubble({required this.text, required this.isMe});
+  const ChatBubble({super.key, required this.text, required this.isMe});
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +28,8 @@ class _ChatBubble extends StatelessWidget {
   }
 }
 
-class _SuggestedCard extends StatelessWidget {
-  const _SuggestedCard();
+class SuggestedCard extends StatelessWidget {
+  const SuggestedCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +52,8 @@ class _SuggestedCard extends StatelessWidget {
   }
 }
 
-class _ChatInput extends StatelessWidget {
-  const _ChatInput();
+class ChatInput extends StatelessWidget {
+  const ChatInput({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -90,12 +63,12 @@ class _ChatInput extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: Row(
           children: [
-            Expanded(
+            const Expanded(
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Type your symptoms... or use voice',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
               ),
