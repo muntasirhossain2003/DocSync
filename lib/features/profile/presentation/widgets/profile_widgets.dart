@@ -1,32 +1,62 @@
 // lib/features/profile/presentation/widgets/profile_widgets.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ProfileHeader extends StatelessWidget {
+import '../../../../features/home/presentation/providers/user_provider.dart';
+import '../../../../shared/widgets/profile_image_picker.dart';
+
+class ProfileHeader extends ConsumerWidget {
   const ProfileHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final user = Supabase.instance.client.auth.currentUser;
+    final userAsync = ref.watch(currentUserProvider);
 
-    return Row(
+    return Column(
       children: [
-        const CircleAvatar(radius: 28, child: Icon(Icons.person, size: 28)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                user?.email ?? 'Patient',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const Text('Care Plan: Basic'),
-            ],
+        // Profile Image Picker
+        userAsync.when(
+          data: (userData) => ProfileImagePicker(
+            currentImageUrl: userData?.profilePictureUrl,
+            size: 100,
+            onImageUploaded: (newImageUrl) {
+              // Refresh user data after upload
+              ref.invalidate(currentUserProvider);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Profile picture updated!'),
+                  backgroundColor: Colors.green,
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+          ),
+          loading: () => const CircleAvatar(
+            radius: 50,
+            child: CircularProgressIndicator(),
+          ),
+          error: (_, __) => const CircleAvatar(
+            radius: 50,
+            child: Icon(Icons.person, size: 50),
           ),
         ),
-        OutlinedButton(onPressed: () {}, child: const Text('Manage')),
+        const SizedBox(height: 16),
+
+        // User Info
+        Text(
+          user?.email ?? 'Patient',
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        const Text('Care Plan: Basic'),
+        const SizedBox(height: 12),
+        OutlinedButton(onPressed: () {}, child: const Text('Manage Plan')),
       ],
     );
   }

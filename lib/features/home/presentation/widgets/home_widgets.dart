@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../providers/user_provider.dart';
 
 class HomeHeader extends ConsumerWidget {
@@ -16,9 +17,16 @@ class HomeHeader extends ConsumerWidget {
         userAsync.when(
           data: (user) => CircleAvatar(
             radius: 24,
-            backgroundImage: user?.profilePictureUrl != null
-                ? NetworkImage(user!.profilePictureUrl!)
-                : const AssetImage('assets/placeholder.png') as ImageProvider,
+            backgroundImage:
+                user?.profilePictureUrl != null &&
+                    user!.profilePictureUrl!.isNotEmpty
+                ? NetworkImage(user.profilePictureUrl!)
+                : null,
+            child:
+                user?.profilePictureUrl == null ||
+                    user!.profilePictureUrl!.isEmpty
+                ? const Icon(Icons.person)
+                : null,
           ),
           loading: () => const CircleAvatar(
             radius: 24,
