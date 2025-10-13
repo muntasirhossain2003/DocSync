@@ -44,6 +44,8 @@ final upcomingConsultationsProvider =
       }
 
       try {
+        print('Auth User ID: $authUserId');
+
         // First get the user's ID from users table
         final userResponse = await supabase
             .from('users')
@@ -52,6 +54,8 @@ final upcomingConsultationsProvider =
             .single();
 
         final userId = userResponse['id'] as String;
+        print('User ID from users table: $userId');
+        print('Current time for filter: ${DateTime.now().toIso8601String()}');
 
         // Fetch upcoming consultations
         final response = await supabase
@@ -85,6 +89,7 @@ final upcomingConsultationsProvider =
             .order('scheduled_time', ascending: true)
             .limit(5);
 
+        print('Raw response: $response');
         print('Fetched ${(response as List).length} upcoming consultations');
 
         return (response)
@@ -93,8 +98,9 @@ final upcomingConsultationsProvider =
                   ConsultationWithDoctor.fromJson(json as Map<String, dynamic>),
             )
             .toList();
-      } catch (e) {
+      } catch (e, stackTrace) {
         print('Error fetching upcoming consultations: $e');
+        print('Stack trace: $stackTrace');
         return [];
       }
     });
