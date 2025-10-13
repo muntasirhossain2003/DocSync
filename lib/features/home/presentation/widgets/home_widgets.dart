@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
+import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
 
 class HomeHeader extends ConsumerWidget {
@@ -74,11 +76,13 @@ class HomeHeader extends ConsumerWidget {
   }
 }
 
-class UpcomingScheduleSection extends StatelessWidget {
+class UpcomingScheduleSection extends ConsumerWidget {
   const UpcomingScheduleSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final consultationsAsync = ref.watch(upcomingConsultationsProvider);
+
     return Column(
       children: [
         Row(
@@ -105,27 +109,107 @@ class UpcomingScheduleSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 180,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: const [
-              AppointmentCard(
-                doctorName: 'Dr. Alisa Dewali',
-                specialty: 'Cardiovascular',
-                date: 'Feb 24, 9:00am',
-                imageUrl: 'https://i.pravatar.cc/150?img=47',
-                color: Color(0xFF4A90E2),
+        consultationsAsync.when(
+          data: (consultations) {
+            if (consultations.isEmpty) {
+              return Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 48,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'No upcoming appointments',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return SizedBox(
+              height: 180,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: consultations.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final consultation = consultations[index];
+                  final dateFormatter = DateFormat('MMM dd, h:mma');
+
+                  // Generate color based on index
+                  final colors = [
+                    const Color(0xFF4A90E2),
+                    const Color(0xFF5B9FED),
+                    const Color(0xFF6BA3F7),
+                    const Color(0xFF7AB5FF),
+                    const Color(0xFF89C4FF),
+                  ];
+
+                  return AppointmentCard(
+                    doctorName: consultation.doctor.fullName,
+                    specialty: consultation.doctor.specialization,
+                    date: dateFormatter.format(consultation.scheduledTime),
+                    imageUrl:
+                        consultation.doctor.profilePictureUrl ??
+                        'https://i.pravatar.cc/150?img=${47 + index}',
+                    color: colors[index % colors.length],
+                  );
+                },
               ),
-              SizedBox(width: 12),
-              AppointmentCard(
-                doctorName: 'Dr. Ahmed Khan',
-                specialty: 'Odontology',
-                date: 'Feb 25, 10:30am',
-                imageUrl: 'https://i.pravatar.cc/150?img=33',
-                color: Color(0xFF5B9FED),
+            );
+          },
+          loading: () => Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stack) => Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Failed to load appointments',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.red[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  TextButton(
+                    onPressed: () => ref.refresh(upcomingConsultationsProvider),
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ],
