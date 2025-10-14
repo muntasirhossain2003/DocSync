@@ -165,9 +165,10 @@ class UpcomingScheduleSection extends ConsumerWidget {
                     doctorName: consultation.doctor.fullName,
                     specialty: consultation.doctor.specialization,
                     date: dateFormatter.format(consultation.scheduledTime),
-                    imageUrl:
-                        consultation.doctor.profilePictureUrl ??
-                        'https://i.pravatar.cc/150?img=${47 + index}',
+                    imageUrl: _getValidImageUrl(
+                      consultation.doctor.profilePictureUrl,
+                      index,
+                    ),
                     color: colors[index % colors.length],
                   );
                 },
@@ -215,6 +216,18 @@ class UpcomingScheduleSection extends ConsumerWidget {
       ],
     );
   }
+
+  String _getValidImageUrl(String? profilePictureUrl, int index) {
+    // Check if the URL is invalid or the problematic sasthyaseba URL
+    if (profilePictureUrl == null ||
+        profilePictureUrl.isEmpty ||
+        profilePictureUrl == 'https://sasthyaseba.com/default_image_url' ||
+        profilePictureUrl.contains('pravatar.cc')) {
+      // Return empty string to indicate placeholder should be used
+      return '';
+    }
+    return profilePictureUrl;
+  }
 }
 
 class AppointmentCard extends StatelessWidget {
@@ -233,81 +246,151 @@ class AppointmentCard extends StatelessWidget {
     required this.color,
   });
 
+  bool get _isValidImageUrl {
+    return imageUrl.isNotEmpty &&
+        imageUrl != 'https://sasthyaseba.com/default_image_url' &&
+        !imageUrl.contains('pravatar.cc');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
+      width: 280,
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -20,
-            bottom: -10,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomRight: Radius.circular(16),
-              ),
-              child: Image.network(
-                imageUrl,
-                width: 140,
-                height: 160,
-                fit: BoxFit.cover,
-              ),
-            ),
+        gradient: LinearGradient(
+          colors: [color, color.withOpacity(0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      doctorName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                // Round doctor image
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.verified, color: Colors.white, size: 16),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  specialty,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 14,
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: _isValidImageUrl
+                        ? Image.network(
+                            imageUrl,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[200],
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.grey[400],
+                                  size: 30,
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            color: Colors.grey[100],
+                            child: Icon(Icons.person, color: color, size: 30),
+                          ),
                   ),
                 ),
-                const Spacer(),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              doctorName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.verified,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        specialty,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.95),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.access_time, color: Colors.white, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
                       date,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -435,21 +518,21 @@ class CategoriesSection extends ConsumerWidget {
         specialization: category.specialization,
         hospital: 'City General Hospital',
         rating: 4.8,
-        imageUrl: 'https://i.pravatar.cc/150?img=1',
+        imageUrl: '', // Use placeholder
       ),
       DoctorBySpecialty(
         name: 'Dr. Sarah Johnson',
         specialization: category.specialization,
         hospital: 'Medical Center',
         rating: 4.9,
-        imageUrl: 'https://i.pravatar.cc/150?img=5',
+        imageUrl: '', // Use placeholder
       ),
       DoctorBySpecialty(
         name: 'Dr. Robert Williams',
         specialization: category.specialization,
         hospital: 'University Hospital',
         rating: 4.7,
-        imageUrl: 'https://i.pravatar.cc/150?img=8',
+        imageUrl: '', // Use placeholder
       ),
     ];
 
@@ -529,37 +612,109 @@ class CategoriesSection extends ConsumerWidget {
                     itemCount: doctors.length,
                     itemBuilder: (context, index) {
                       final doctor = doctors[index];
+                      final bool isValidUrl = doctor.imageUrl.isNotEmpty &&
+                          doctor.imageUrl != 'https://sasthyaseba.com/default_image_url' &&
+                          !doctor.imageUrl.contains('pravatar.cc');
+
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
-                          leading: CircleAvatar(
-                            radius: 25,
-                            backgroundImage: NetworkImage(doctor.imageUrl),
-                          ),
-                          title: Text(doctor.name),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
                             children: [
-                              Text(doctor.hospital),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 16,
-                                    color: Colors.amber,
+                              // Round fixed-size image
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey[200],
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: isValidUrl
+                                      ? Image.network(
+                                          doctor.imageUrl,
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return Icon(
+                                                  Icons.person,
+                                                  color: Colors.grey[400],
+                                                  size: 30,
+                                                );
+                                              },
+                                        )
+                                      : Icon(
+                                          Icons.person,
+                                          color: Colors.grey[400],
+                                          size: 30,
+                                        ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      doctor.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      doctor.hospital,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.star,
+                                          size: 16,
+                                          color: Colors.amber,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${doctor.rating}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              FilledButton(
+                                onPressed: () {},
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 10,
                                   ),
-                                  Text(' ${doctor.rating}'),
-                                ],
+                                ),
+                                child: const Text('Book'),
                               ),
                             ],
-                          ),
-                          trailing: FilledButton(
-                            onPressed: () {},
-                            child: const Text('Book'),
                           ),
                         ),
                       );
@@ -643,28 +798,33 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 80,
+      height: 100,
       child: Column(
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Center(child: Icon(icon, color: color, size: 32)),
+            child: Center(child: Icon(icon, color: color, size: 28)),
           ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 32, // Fixed height for text area
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+                height: 1.1,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -709,7 +869,7 @@ class TopDoctorsSection extends StatelessWidget {
           hospital: 'Asian Hospital',
           rating: 4.8,
           reviews: 565,
-          imageUrl: 'https://i.pravatar.cc/150?img=14',
+          imageUrl: '', // Use placeholder
         ),
         const SizedBox(height: 12),
         const DoctorCard(
@@ -718,7 +878,7 @@ class TopDoctorsSection extends StatelessWidget {
           hospital: 'Apollo Hospital',
           rating: 4.9,
           reviews: 741,
-          imageUrl: 'https://i.pravatar.cc/150?img=13',
+          imageUrl: '', // Use placeholder
         ),
       ],
     );
@@ -769,7 +929,29 @@ class DoctorCard extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(imageUrl, fit: BoxFit.cover),
+              child: imageUrl.isNotEmpty && !imageUrl.contains('pravatar.cc')
+                  ? Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: const Color(0xFFE3F2FD),
+                          child: const Icon(
+                            Icons.person,
+                            color: Colors.blue,
+                            size: 35,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: const Color(0xFFE3F2FD),
+                      child: const Icon(
+                        Icons.person,
+                        color: Colors.blue,
+                        size: 35,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 16),

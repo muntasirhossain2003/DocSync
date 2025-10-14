@@ -1,8 +1,6 @@
 // lib/features/home/presentation/providers/consultation_provider.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../../consult/data/repositories/doctor_repository.dart';
 import '../../../consult/domain/models/doctor.dart';
 

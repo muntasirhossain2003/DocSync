@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../data/repositories/doctor_repository.dart';
 import '../../domain/models/doctor.dart';
 import '../providers/doctor_provider.dart';
@@ -126,16 +127,12 @@ class DoctorCard extends StatelessWidget {
                 // Doctor Avatar
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage:
-                      doctor.profilePictureUrl != null &&
-                          doctor.profilePictureUrl!.isNotEmpty
+                  backgroundImage: _isValidImageUrl(doctor.profilePictureUrl)
                       ? NetworkImage(doctor.profilePictureUrl!)
                       : null,
-                  child:
-                      doctor.profilePictureUrl == null ||
-                          doctor.profilePictureUrl!.isEmpty
-                      ? const Icon(Icons.person, size: 30)
-                      : null,
+                  child: _isValidImageUrl(doctor.profilePictureUrl)
+                      ? null
+                      : const Icon(Icons.person, size: 30),
                 ),
                 const SizedBox(width: 12),
 
@@ -304,18 +301,25 @@ class DoctorCard extends StatelessWidget {
     );
     // TODO: Implement video call functionality
   }
+
+  bool _isValidImageUrl(String? url) {
+    return url != null &&
+        url.isNotEmpty &&
+        url != 'https://sasthyaseba.com/default_image_url';
+  }
 }
 
-class BookConsultationSheet extends StatefulWidget {
+class BookConsultationSheet extends ConsumerStatefulWidget {
   final Doctor doctor;
 
   const BookConsultationSheet({super.key, required this.doctor});
 
   @override
-  State<BookConsultationSheet> createState() => _BookConsultationSheetState();
+  ConsumerState<BookConsultationSheet> createState() =>
+      _BookConsultationSheetState();
 }
 
-class _BookConsultationSheetState extends State<BookConsultationSheet> {
+class _BookConsultationSheetState extends ConsumerState<BookConsultationSheet> {
   String consultationType = 'video';
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -356,11 +360,15 @@ class _BookConsultationSheetState extends State<BookConsultationSheet> {
       );
 
       if (mounted) {
+        // Refresh the upcoming consultations provider
+        ref.invalidate(upcomingConsultationsProvider);
+
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Consultation booked successfully!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
           ),
         );
       }

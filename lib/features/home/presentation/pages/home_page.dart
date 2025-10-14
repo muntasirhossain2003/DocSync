@@ -8,23 +8,23 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+    return const Scaffold(
+      backgroundColor: Color(0xFFF5F5F5),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding:  EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const HomeHeader(),
-                const SizedBox(height: 24),
-                const UpcomingScheduleSection(),
-                const SizedBox(height: 24),
-                const CategoriesSection(),
-                const SizedBox(height: 24),
-                const TopDoctorsSection(),
-                const SizedBox(height: 80),
+                HomeHeader(),
+                SizedBox(height: 24),
+                UpcomingScheduleSection(),
+                SizedBox(height: 24),
+                CategoriesSection(),
+                SizedBox(height: 24),
+                TopDoctorsSection(),
+                SizedBox(height: 80),
               ],
             ),
           ),

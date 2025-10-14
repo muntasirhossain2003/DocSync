@@ -1,5 +1,4 @@
 // lib/features/consult/data/repositories/doctor_repository.dart
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/models/doctor.dart';
