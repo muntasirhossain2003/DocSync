@@ -612,8 +612,10 @@ class CategoriesSection extends ConsumerWidget {
                     itemCount: doctors.length,
                     itemBuilder: (context, index) {
                       final doctor = doctors[index];
-                      final bool isValidUrl = doctor.imageUrl.isNotEmpty &&
-                          doctor.imageUrl != 'https://sasthyaseba.com/default_image_url' &&
+                      final bool isValidUrl =
+                          doctor.imageUrl.isNotEmpty &&
+                          doctor.imageUrl !=
+                              'https://sasthyaseba.com/default_image_url' &&
                           !doctor.imageUrl.contains('pravatar.cc');
 
                       return Card(

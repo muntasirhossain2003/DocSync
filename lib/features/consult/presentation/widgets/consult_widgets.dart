@@ -11,21 +11,107 @@ import '../providers/doctor_provider.dart';
 class ConsultSearchBar extends ConsumerWidget {
   const ConsultSearchBar({super.key});
 
+  void _showFilterSheet(BuildContext context, WidgetRef ref) {
+    final specializations = ref.read(specializationsProvider);
+    final selected = ref.read(selectedSpecializationProvider);
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Filter by Specialization',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FilterChip(
+                    label: const Text('All'),
+                    selected: selected == null,
+                    onSelected: (_) {
+                      ref.read(selectedSpecializationProvider.notifier).state =
+                          null;
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ...specializations.map((spec) {
+                    return FilterChip(
+                      label: Text(spec),
+                      selected: selected == spec,
+                      onSelected: (_) {
+                        ref
+                                .read(selectedSpecializationProvider.notifier)
+                                .state =
+                            spec;
+                        Navigator.pop(context);
+                      },
+                    );
+                  }),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedSpecializationProvider);
+
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: TextField(
-        onChanged: (value) {
-          ref.read(searchQueryProvider.notifier).state = value;
-        },
-        decoration: InputDecoration(
-          hintText: 'Search doctors, specialization... ',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.grey.shade50,
-        ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              onChanged: (value) {
+                ref.read(searchQueryProvider.notifier).state = value;
+              },
+              decoration: InputDecoration(
+                hintText: 'Search doctors, specialization...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            height: 56,
+            decoration: BoxDecoration(
+              color: selected != null ? Colors.indigo : Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: selected != null ? Colors.indigo : Colors.grey.shade300,
+              ),
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.filter_list,
+                color: selected != null ? Colors.white : Colors.grey.shade700,
+              ),
+              onPressed: () => _showFilterSheet(context, ref),
+              tooltip: 'Filter by specialization',
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -517,6 +603,40 @@ class _BookConsultationSheetState extends ConsumerState<BookConsultationSheet> {
           ),
           const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+}
+
+class ConsultFilterBar extends ConsumerWidget {
+  const ConsultFilterBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final specializations = ref.watch(specializationsProvider);
+    final selected = ref.watch(selectedSpecializationProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: DropdownButtonFormField<String>(
+        value: selected,
+        hint: const Text('Filter by specialization'),
+        isExpanded: true,
+        decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.filter_list),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.grey.shade50,
+        ),
+        items: [
+          const DropdownMenuItem(value: null, child: Text('All')),
+          ...specializations.map(
+            (spec) => DropdownMenuItem(value: spec, child: Text(spec)),
+          ),
+        ],
+        onChanged: (value) {
+          ref.read(selectedSpecializationProvider.notifier).state = value;
+        },
       ),
     );
   }

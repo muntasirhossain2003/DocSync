@@ -1,7 +1,5 @@
 // lib/features/consult/presentation/providers/doctor_provider.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../data/repositories/doctor_repository.dart';
 import '../../domain/models/doctor.dart';
 
@@ -10,37 +8,50 @@ final doctorRepositoryProvider = Provider<DoctorRepository>((ref) {
   return DoctorRepository();
 });
 
-// All doctors provider
+// All doctors
 final doctorsProvider = FutureProvider<List<Doctor>>((ref) async {
-  final repository = ref.watch(doctorRepositoryProvider);
-  return repository.fetchAllDoctors();
+  final repo = ref.watch(doctorRepositoryProvider);
+  return repo.fetchAllDoctors();
 });
 
-// Search provider with state
+// Search query
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
-// Filtered doctors based on search
-final filteredDoctorsProvider = FutureProvider<List<Doctor>>((ref) async {
-  final repository = ref.watch(doctorRepositoryProvider);
-  final query = ref.watch(searchQueryProvider);
+// Selected specialization
+final selectedSpecializationProvider = StateProvider<String?>((ref) => null);
 
-  if (query.isEmpty) {
-    return repository.fetchAllDoctors();
+// Combined filter
+final filteredDoctorsProvider = FutureProvider<List<Doctor>>((ref) async {
+  final repo = ref.watch(doctorRepositoryProvider);
+  final query = ref.watch(searchQueryProvider);
+  final specialization = ref.watch(selectedSpecializationProvider);
+
+  // If specialization only
+  if ((query.isEmpty || query.trim().isEmpty) &&
+      (specialization == null || specialization.isEmpty)) {
+    return repo.fetchAllDoctors();
   }
 
-  return repository.searchDoctors(query);
+  // If specialization and query both
+  if (specialization != null && specialization.isNotEmpty && query.isNotEmpty) {
+    final doctors = await repo.fetchDoctorsBySpecialization(specialization);
+    return doctors
+        .where((d) =>
+            d.fullName.toLowerCase().contains(query.toLowerCase()) ||
+            d.specialization.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  }
+
+  // Only specialization
+  if (specialization != null && specialization.isNotEmpty) {
+    return repo.fetchDoctorsBySpecialization(specialization);
+  }
+
+  // Only search query
+  return repo.searchDoctors(query);
 });
 
-// Single doctor provider
-final doctorByIdProvider = FutureProvider.family<Doctor?, String>((
-  ref,
-  doctorId,
-) async {
-  final repository = ref.watch(doctorRepositoryProvider);
-  return repository.fetchDoctorById(doctorId);
-});
-
-// Specializations list (you can customize this)
+// Specializations list
 final specializationsProvider = Provider<List<String>>((ref) {
   return [
     'General Physician',

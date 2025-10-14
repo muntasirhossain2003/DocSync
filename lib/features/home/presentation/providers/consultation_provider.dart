@@ -42,8 +42,6 @@ final upcomingConsultationsProvider =
       }
 
       try {
-        print('Auth User ID: $authUserId');
-
         // First get the user's ID from users table
         final userResponse = await supabase
             .from('users')
@@ -52,8 +50,6 @@ final upcomingConsultationsProvider =
             .single();
 
         final userId = userResponse['id'] as String;
-        print('User ID from users table: $userId');
-        print('Current time for filter: ${DateTime.now().toIso8601String()}');
 
         // Fetch upcoming consultations
         final response = await supabase

@@ -43,22 +43,15 @@ class DoctorRepository {
         return fetchAllDoctors();
       }
 
-      final response = await _supabase
-          .from('doctors')
-          .select('''
-            *,
-            users!inner (
-              full_name,
-              email,
-              profile_picture_url
-            )
-          ''')
-          .or('specialization.ilike.%$query%,users.full_name.ilike.%$query%')
-          .order('created_at', ascending: false);
+      // Fetch all doctors and filter in memory since we can't use OR on joined tables
+      final allDoctors = await fetchAllDoctors();
+      final lowerQuery = query.toLowerCase();
 
-      return (response as List)
-          .map((json) => Doctor.fromJson(json as Map<String, dynamic>))
-          .toList();
+      return allDoctors.where((doctor) {
+        return doctor.fullName.toLowerCase().contains(lowerQuery) ||
+            doctor.specialization.toLowerCase().contains(lowerQuery) ||
+            (doctor.qualification?.toLowerCase().contains(lowerQuery) ?? false);
+      }).toList();
     } catch (e) {
       print('Error searching doctors: $e');
       throw Exception('Failed to search doctors: $e');
