@@ -1,6 +1,8 @@
 // lib/features/home/presentation/providers/consultation_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../auth/presentation/provider/auth_provider.dart';
 import '../../../consult/data/repositories/doctor_repository.dart';
 import '../../../consult/domain/models/doctor.dart';
 
@@ -34,6 +36,8 @@ class ConsultationWithDoctor {
 // Provider to fetch upcoming consultations for current user
 final upcomingConsultationsProvider =
     FutureProvider<List<ConsultationWithDoctor>>((ref) async {
+      // Re-run when auth state changes
+      ref.watch(authStateProvider);
       final supabase = Supabase.instance.client;
       final authUserId = supabase.auth.currentUser?.id;
 
@@ -87,14 +91,9 @@ final upcomingConsultationsProvider =
         print('Fetched ${(response as List).length} upcoming consultations');
 
         return (response)
-            .map(
-              (json) =>
-                  ConsultationWithDoctor.fromJson(json as Map<String, dynamic>),
-            )
+            .map((json) => ConsultationWithDoctor.fromJson(json))
             .toList();
-      } catch (e, stackTrace) {
-        print('Error fetching upcoming consultations: $e');
-        print('Stack trace: $stackTrace');
+      } catch (e) {
         return [];
       }
     });
@@ -104,8 +103,6 @@ final topDoctorsProvider = FutureProvider<List<Doctor>>((ref) async {
   final repository = DoctorRepository();
 
   try {
-    // Fetch all doctors and return top ones
-    // In a real app, you'd have a rating system in the database
     final doctors = await repository.fetchAllDoctors();
 
     // Return first 5 doctors as "top doctors"
