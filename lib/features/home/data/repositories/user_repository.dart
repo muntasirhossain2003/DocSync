@@ -8,17 +8,22 @@ class UserRepository {
 
   Future<domain_user.User?> fetchCurrentUser() async {
     final authUser = _supabase.auth.currentUser;
-    if (authUser == null) return null;
+    if (authUser == null) {
+      print('⚠️ No auth user found');
+      return null;
+    }
 
     try {
-      print('Fetching user with auth_id: ${authUser.id}');
+      print('📱 Fetching user with auth_id: ${authUser.id}');
+      print('📧 Auth user email: ${authUser.email}');
+
       final response = await _supabase
           .from('users')
           .select('id, full_name, profile_picture_url')
           .eq('auth_id', authUser.id)
           .single();
 
-      print('User data fetched: $response');
+      print('✅ User data fetched: $response');
       return domain_user.User.fromJson(response);
     } catch (e) {
       print('Error fetching user from database: $e');

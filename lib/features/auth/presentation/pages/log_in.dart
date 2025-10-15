@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../home/presentation/providers/consultation_provider.dart';
+import '../../../home/presentation/providers/user_provider.dart';
 import '../provider/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -15,23 +18,51 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool loading = false;
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> login() async {
     setState(() => loading = true);
     final supabase = ref.read(supabaseClientProvider);
 
     try {
+      // Ensure any previous session is cleared before signing in
+      await supabase.auth.signOut();
+
+      // Small delay to ensure session is fully cleared
+      await Future.delayed(const Duration(milliseconds: 300));
+
       final response = await supabase.auth.signInWithPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
       if (response.user != null) {
-        print("Login success");
+        print('✅ Login successful for user: ${response.user!.email}');
+        print('✅ User ID: ${response.user!.id}');
+
+        // Invalidate downstream data dependent on the user
+        ref.invalidate(sessionProvider);
+        ref.invalidate(authStateProvider);
+        ref.invalidate(currentUserProvider);
+        ref.invalidate(upcomingConsultationsProvider);
+
+        // Wait for providers to refresh
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        // Navigate to home/root
+        if (mounted) {
+          context.go('/home');
+        }
       }
     } on AuthException catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     } finally {
       setState(() => loading = false);
     }
