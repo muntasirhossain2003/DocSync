@@ -26,16 +26,36 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // After animation, decide route based on session
-    Future.delayed(const Duration(seconds: 2), () {
+    // Check session and navigate after animation
+    _checkSessionAndNavigate();
+  }
+
+  Future<void> _checkSessionAndNavigate() async {
+    // Wait for animation to complete
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    try {
+      // Get current session
       final session = Supabase.instance.client.auth.currentSession;
-      if (!mounted) return;
+
+      print('🔍 Splash: Checking session...');
+      print('Session exists: ${session != null}');
+
       if (session != null) {
+        print('✅ Splash: User logged in, navigating to /home');
         context.go('/home');
       } else {
+        print('❌ Splash: No session, navigating to /login');
         context.go('/login');
       }
-    });
+    } catch (e) {
+      print('❌ Splash: Error checking session: $e');
+      if (mounted) {
+        context.go('/login');
+      }
+    }
   }
 
   @override

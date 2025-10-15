@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
+import '../../../video_call/domain/models/call_state.dart';
+import '../../../video_call/presentation/pages/video_call_page.dart';
 import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
 
@@ -143,7 +145,7 @@ class UpcomingScheduleSection extends ConsumerWidget {
             }
 
             return SizedBox(
-              height: 180,
+              height: 220,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: consultations.length,
@@ -162,9 +164,12 @@ class UpcomingScheduleSection extends ConsumerWidget {
                   ];
 
                   return AppointmentCard(
+                    consultation: consultation,
                     doctorName: consultation.doctor.fullName,
                     specialty: consultation.doctor.specialization,
-                    date: dateFormatter.format(consultation.scheduledTime),
+                    date: dateFormatter.format(
+                      consultation.scheduledTime.toLocal(),
+                    ),
                     imageUrl: _getValidImageUrl(
                       consultation.doctor.profilePictureUrl,
                       index,
@@ -231,6 +236,7 @@ class UpcomingScheduleSection extends ConsumerWidget {
 }
 
 class AppointmentCard extends StatelessWidget {
+  final ConsultationWithDoctor consultation;
   final String doctorName;
   final String specialty;
   final String date;
@@ -239,6 +245,7 @@ class AppointmentCard extends StatelessWidget {
 
   const AppointmentCard({
     super.key,
+    required this.consultation,
     required this.doctorName,
     required this.specialty,
     required this.date,
@@ -272,16 +279,17 @@ class AppointmentCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
                 // Round doctor image
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,
@@ -297,8 +305,8 @@ class AppointmentCard extends StatelessWidget {
                     child: _isValidImageUrl
                         ? Image.network(
                             imageUrl,
-                            width: 60,
-                            height: 60,
+                            width: 50,
+                            height: 50,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
@@ -329,7 +337,7 @@ class AppointmentCard extends StatelessWidget {
                               doctorName,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 17,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -340,16 +348,16 @@ class AppointmentCard extends StatelessWidget {
                           const Icon(
                             Icons.verified,
                             color: Colors.white,
-                            size: 18,
+                            size: 16,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         specialty,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.95),
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -358,23 +366,23 @@ class AppointmentCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.access_time, color: Colors.white, size: 16),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.access_time, color: Colors.white, size: 14),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       date,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -384,13 +392,99 @@ class AppointmentCard extends StatelessWidget {
                   const Icon(
                     Icons.arrow_forward_ios,
                     color: Colors.white,
-                    size: 14,
+                    size: 12,
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            _buildJoinCallButton(context),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildJoinCallButton(BuildContext context) {
+    // Check if consultation is within joining window
+    // Convert both times to UTC for consistent comparison
+    final now = DateTime.now().toUtc();
+    final scheduledTime = consultation.scheduledTime.toUtc();
+    final difference = scheduledTime.difference(now);
+
+    // Can join if:
+    // - Within 15 minutes BEFORE scheduled time (difference is positive and <= 15)
+    // - Up to 30 minutes AFTER scheduled time (difference is negative and >= -30)
+    final canJoin = difference.inMinutes <= 15 && difference.inMinutes >= -30;
+
+    if (consultation.consultationType != 'video') {
+      return const SizedBox.shrink();
+    }
+
+    // Get user-friendly message
+    String buttonText;
+    if (canJoin) {
+      buttonText = 'Join Video Call';
+    } else if (difference.inMinutes > 15) {
+      // Too early - more than 15 minutes before
+      final minutesUntil = difference.inMinutes;
+
+      // Format time remaining in user-friendly way
+      if (minutesUntil > 1440) {
+        // More than 24 hours - show days
+        final days = (minutesUntil / 1440).floor();
+        buttonText = 'Available in ${days}d';
+      } else if (minutesUntil > 60) {
+        // More than 1 hour - show hours
+        final hours = (minutesUntil / 60).floor();
+        buttonText = 'Available in ${hours}h';
+      } else {
+        // Less than 1 hour - show minutes
+        buttonText = 'Available in ${minutesUntil}m';
+      }
+    } else {
+      // Too late - more than 30 minutes after
+      buttonText = 'Call Ended';
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: canJoin ? () => _joinVideoCall(context) : null,
+        icon: Icon(canJoin ? Icons.video_call : Icons.schedule, size: 18),
+        label: Text(
+          buttonText,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: canJoin
+              ? Colors.white
+              : Colors.white.withOpacity(0.5),
+          foregroundColor: canJoin ? color : Colors.grey,
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _joinVideoCall(BuildContext context) {
+    // Create video call info and navigate
+    final callInfo = VideoCallInfo(
+      consultationId: consultation.id,
+      doctorId: consultation.doctor.id,
+      doctorName: consultation.doctor.fullName,
+      doctorProfileUrl: consultation.doctor.profilePictureUrl,
+      patientId: '', // Will be filled from auth in the video call page
+      patientName: '', // Will be filled from auth in the video call page
+      scheduledTime: consultation.scheduledTime,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VideoCallPage(callInfo: callInfo),
       ),
     );
   }

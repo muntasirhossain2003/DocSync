@@ -26,6 +26,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> login() async {
+    if (!mounted) return;
     setState(() => loading = true);
     final supabase = ref.read(supabaseClientProvider);
 
@@ -41,7 +42,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         password: passwordController.text.trim(),
       );
 
-      if (response.user != null) {
+      if (response.user != null && mounted) {
         print('✅ Login successful for user: ${response.user!.email}');
         print('✅ User ID: ${response.user!.id}');
 
@@ -51,20 +52,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ref.invalidate(currentUserProvider);
         ref.invalidate(upcomingConsultationsProvider);
 
-        // Wait for providers to refresh
-        await Future.delayed(const Duration(milliseconds: 100));
-
-        // Navigate to home/root
-        if (mounted) {
-          context.go('/home');
-        }
+        // Navigate to home immediately - let router handle the rest
+        context.go('/home');
       }
     } on AuthException catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } finally {
-      setState(() => loading = false);
+      if (mounted) {
+        setState(() => loading = false);
+      }
     }
   }
 
