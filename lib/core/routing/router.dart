@@ -13,6 +13,8 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../shared/widgets/splash_screen.dart';
 import '../widgets/patient_shell.dart';
+import '../../features/subscription/pages/subscription_page.dart';
+import '../../features/subscription/pages/subscription_plan.dart';
 
 class _AuthRefresh extends ChangeNotifier {
   _AuthRefresh() {
@@ -108,9 +110,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfilePage(),
+  path: '/profile',
+  builder: (context, state) => const ProfilePage(),
+  routes: [
+    // Subscription status page
+          GoRoute(
+            path: 'subscription',
+            builder: (context, state) => const SubscriptionStatusPage(),
+            routes: [
+              // Nested subscription plans page
+              GoRoute(
+                path: 'plans', // full path: /profile/subscription/plans
+                builder: (context, state) => const SubscriptionPlansPage(),
               ),
+            ],
+          ),
+        ],
+      ),
             ],
           ),
         ],
