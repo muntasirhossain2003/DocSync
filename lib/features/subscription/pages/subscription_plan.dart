@@ -1,7 +1,8 @@
 // presentation/pages/subscription_plans_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
+import '../../../core/theme/theme.dart';
 import '../provider/subscription_plan_provider.dart';
 
 class SubscriptionPlansPage extends ConsumerWidget {
@@ -16,7 +17,7 @@ class SubscriptionPlansPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text("Annual Subscription Plans",
         style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: AppColors.dark_blue,
         elevation: 0,
       ),
       body: plansAsync.when(
@@ -90,7 +91,7 @@ class SubscriptionPlansPage extends ConsumerWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade700,
+                            backgroundColor: AppColors.dark_blue,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -98,8 +99,7 @@ class SubscriptionPlansPage extends ConsumerWidget {
                             elevation: 4,
                           ),
                           onPressed: () {
-                            // TODO: implement subscription selection
-                            print('Selected plan: ${plan.name}');
+                            context.push('/profile/subscription/plans/checkout', extra:plan);
                           },
                           child: const Text(
                             "Select Plan",

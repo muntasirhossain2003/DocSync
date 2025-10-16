@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-
+import '../../../../core/theme/theme.dart';
 import '../../../video_call/domain/models/call_state.dart';
 import '../../../video_call/presentation/pages/video_call_page.dart';
 import '../providers/consultation_provider.dart';
@@ -117,7 +117,7 @@ class UpcomingScheduleSection extends ConsumerWidget {
               return Container(
                 height: 180,
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: AppColors.light_blue,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(

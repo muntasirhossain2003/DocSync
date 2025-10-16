@@ -1,6 +1,6 @@
 // lib/features/consult/presentation/pages/consult_page.dart
 import 'package:flutter/material.dart';
-
+import '../../../../core/theme/theme.dart';
 import '../widgets/consult_widgets.dart';
 
 class ConsultPage extends StatelessWidget {
@@ -10,6 +10,7 @@ class ConsultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SafeArea(
       child: Scaffold(
+        backgroundColor: AppColors.lighter_blue,
         body: Column(children: [ConsultSearchBar(), DoctorList()]),
       ),
     );

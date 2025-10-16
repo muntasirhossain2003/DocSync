@@ -54,7 +54,6 @@ class ProfileHeader extends ConsumerWidget {
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        const Text('Care Plan: Basic'),
         const SizedBox(height: 12),
         OutlinedButton(onPressed: () {
           context.push('/profile/subscription');
