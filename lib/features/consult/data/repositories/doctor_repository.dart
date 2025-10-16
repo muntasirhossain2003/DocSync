@@ -122,7 +122,7 @@ class DoctorRepository {
             'patient_id': patientId,
             'doctor_id': doctorId,
             'consultation_type': consultationType,
-            'scheduled_time': scheduledTime.toIso8601String(),
+            'scheduled_time': scheduledTime.toUtc().toIso8601String(),
             'consultation_status': 'scheduled',
           })
           .select()

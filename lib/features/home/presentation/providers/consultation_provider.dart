@@ -72,6 +72,7 @@ final upcomingConsultationsProvider =
             consultation_fee,
             availability_start,
             availability_end,
+            is_available,
             bio,
             created_at,
             users!inner (
@@ -83,7 +84,7 @@ final upcomingConsultationsProvider =
         ''')
             .eq('patient_id', userId)
             .eq('consultation_status', 'scheduled')
-            .gte('scheduled_time', DateTime.now().toIso8601String())
+            .gte('scheduled_time', DateTime.now().toUtc().toIso8601String())
             .order('scheduled_time', ascending: true)
             .limit(5);
 

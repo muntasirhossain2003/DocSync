@@ -29,6 +29,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> login() async {
+    if (!mounted) return;
     setState(() => loading = true);
     final supabase = ref.read(supabaseClientProvider);
 

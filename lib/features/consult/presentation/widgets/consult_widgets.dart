@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../home/presentation/providers/consultation_provider.dart';
+import '../../../video_call/domain/models/call_state.dart';
+import '../../../video_call/presentation/pages/video_call_page.dart';
 import '../../data/repositories/doctor_repository.dart';
 import '../../domain/models/doctor.dart';
 import '../providers/doctor_provider.dart';
@@ -379,13 +381,22 @@ class DoctorCard extends StatelessWidget {
   }
 
   void _instantCall(BuildContext context, Doctor doctor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Starting video call with Dr. ${doctor.fullName}...'),
-        backgroundColor: Colors.green,
+    // Create a temporary consultation for instant call
+    final callInfo = VideoCallInfo(
+      consultationId: 'instant_${DateTime.now().millisecondsSinceEpoch}',
+      doctorId: doctor.id,
+      doctorName: doctor.fullName,
+      doctorProfileUrl: doctor.profilePictureUrl,
+      patientId: '', // Will be filled from auth in the video call page
+      patientName: '', // Will be filled from auth in the video call page
+      scheduledTime: DateTime.now(),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VideoCallPage(callInfo: callInfo),
       ),
     );
-    // TODO: Implement video call functionality
   }
 
   bool _isValidImageUrl(String? url) {

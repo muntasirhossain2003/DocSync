@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../features/ai_assistant/presentation/pages/ai_assistant_page.dart';
 import '../../features/auth/presentation/pages/log_in.dart';
 import '../../features/auth/presentation/pages/register.dart';
@@ -28,19 +29,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   String? redirect(BuildContext context, GoRouterState state) {
     final session = Supabase.instance.client.auth.currentSession;
     final isLoggedIn = session != null;
-    final isAuthRoute =
-        state.matchedLocation == '/login' ||
-        state.matchedLocation == '/register';
-    final isSplash = state.matchedLocation == '/splash';
+    final location = state.matchedLocation;
 
-    if (isSplash) return null; // allow splash to decide
+    // Allow splash screen to handle its own logic
+    if (location == '/splash') return null;
 
-    if (!isLoggedIn && !isAuthRoute) {
+    // If not logged in and not on auth pages, redirect to login
+    if (!isLoggedIn && location != '/login' && location != '/register') {
       return '/login';
     }
-    if (isLoggedIn && isAuthRoute) {
+
+    // If logged in and on auth pages, redirect to home
+    if (isLoggedIn && (location == '/login' || location == '/register')) {
       return '/home';
     }
+
+    // Otherwise, allow the navigation
     return null;
   }
 
