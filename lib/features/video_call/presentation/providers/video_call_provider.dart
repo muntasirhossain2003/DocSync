@@ -143,6 +143,11 @@ class VideoCallController extends StateNotifier<CallState> {
     await _agoraService.switchCamera();
   }
 
+  Future<void> toggleSpeaker() async {
+    _isSpeakerEnabled = !_isSpeakerEnabled;
+    await _agoraService.toggleSpeaker(_isSpeakerEnabled);
+  }
+
   Future<void> endCall() async {
     await _agoraService.leaveChannel();
     state = CallState.disconnected;

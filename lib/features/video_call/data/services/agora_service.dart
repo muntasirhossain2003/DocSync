@@ -105,6 +105,11 @@ class AgoraService {
     await _engine!.muteLocalVideoStream(!enabled);
   }
 
+  Future<void> toggleSpeaker(bool enabled) async {
+    if (_engine == null) return;
+    await _engine!.setEnableSpeakerphone(enabled);
+  }
+
   void registerEventHandler(RtcEngineEventHandler eventHandler) {
     if (_engine == null) return;
     _engine!.registerEventHandler(eventHandler);

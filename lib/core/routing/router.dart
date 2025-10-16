@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../features/ai_assistant/presentation/pages/ai_assistant_page.dart';
 import '../../features/auth/presentation/pages/log_in.dart';
 import '../../features/auth/presentation/pages/register.dart';
@@ -11,6 +10,8 @@ import '../../features/consult/presentation/pages/consult_page.dart';
 import '../../features/health/presentation/pages/health_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/video_call/domain/models/call_state.dart';
+import '../../features/video_call/presentation/pages/video_call_page.dart';
 import '../../shared/widgets/splash_screen.dart';
 import '../widgets/patient_shell.dart';
 import '../../features/subscription/pages/subscription_page.dart';
@@ -65,6 +66,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+
+      // Video Call Route (outside shell - no bottom navigation)
+      GoRoute(
+        path: '/video-call',
+        builder: (context, state) {
+          final callInfo = state.extra as VideoCallInfo;
+          return VideoCallPage(callInfo: callInfo);
+        },
       ),
 
       // Patient Shell with 5 tabs

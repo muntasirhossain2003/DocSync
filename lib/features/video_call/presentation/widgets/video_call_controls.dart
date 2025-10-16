@@ -1,6 +1,5 @@
 // lib/features/video_call/presentation/widgets/video_call_controls.dart
 import 'package:flutter/material.dart';
-
 import '../../domain/models/call_state.dart';
 
 class VideoCallControls extends StatelessWidget {
@@ -9,8 +8,10 @@ class VideoCallControls extends StatelessWidget {
   final VoidCallback onToggleMicrophone;
   final VoidCallback onToggleCamera;
   final VoidCallback onSwitchCamera;
+  final VoidCallback onToggleSpeaker;
   final bool isMuted;
   final bool isCameraEnabled;
+  final bool isSpeakerEnabled;
 
   const VideoCallControls({
     super.key,
@@ -19,8 +20,10 @@ class VideoCallControls extends StatelessWidget {
     required this.onToggleMicrophone,
     required this.onToggleCamera,
     required this.onSwitchCamera,
+    required this.onToggleSpeaker,
     required this.isMuted,
     required this.isCameraEnabled,
+    required this.isSpeakerEnabled,
   });
 
   @override
@@ -45,7 +48,6 @@ class VideoCallControls extends StatelessWidget {
                 ? Colors.red
                 : Colors.white.withOpacity(0.3),
             iconColor: isMuted ? Colors.white : Colors.white,
-            label: isMuted ? 'Unmute' : 'Mute',
           ),
 
           // Camera toggle
@@ -56,7 +58,16 @@ class VideoCallControls extends StatelessWidget {
                 ? Colors.white.withOpacity(0.3)
                 : Colors.red,
             iconColor: Colors.white,
-            label: isCameraEnabled ? 'Stop Video' : 'Start Video',
+          ),
+
+          // Speaker toggle
+          _buildControlButton(
+            icon: isSpeakerEnabled ? Icons.volume_up : Icons.volume_off,
+            onPressed: onToggleSpeaker,
+            backgroundColor: isSpeakerEnabled
+                ? Colors.white.withOpacity(0.3)
+                : Colors.red,
+            iconColor: Colors.white,
           ),
 
           // Switch camera
@@ -65,7 +76,6 @@ class VideoCallControls extends StatelessWidget {
             onPressed: onSwitchCamera,
             backgroundColor: Colors.white.withOpacity(0.3),
             iconColor: Colors.white,
-            label: 'Switch',
           ),
 
           // End call
@@ -74,7 +84,6 @@ class VideoCallControls extends StatelessWidget {
             onPressed: onEndCall,
             backgroundColor: Colors.red,
             iconColor: Colors.white,
-            label: 'End Call',
             isLarge: true,
           ),
         ],
@@ -87,42 +96,27 @@ class VideoCallControls extends StatelessWidget {
     required VoidCallback onPressed,
     required Color backgroundColor,
     required Color iconColor,
-    required String label,
     bool isLarge = false,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: isLarge ? 64 : 56,
-          height: isLarge ? 64 : 56,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    return Container(
+      width: isLarge ? 64 : 56,
+      height: isLarge ? 64 : 56,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          child: IconButton(
-            icon: Icon(icon, size: isLarge ? 32 : 28),
-            color: iconColor,
-            onPressed: onPressed,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: isLarge ? 32 : 28),
+        color: iconColor,
+        onPressed: onPressed,
+      ),
     );
   }
 }
