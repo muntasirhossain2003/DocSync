@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/home_widgets.dart';
+import '../../../../core/theme/theme.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -9,7 +10,7 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return const Scaffold(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: AppColors.lighter_blue,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

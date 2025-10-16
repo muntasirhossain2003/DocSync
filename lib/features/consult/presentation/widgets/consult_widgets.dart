@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import '../../../../core/theme/theme.dart';
 import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../../video_call/domain/models/call_state.dart';
 import '../../../video_call/presentation/pages/video_call_page.dart';
@@ -90,7 +90,7 @@ class ConsultSearchBar extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: AppColors.light_blue,
               ),
             ),
           ),
