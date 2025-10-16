@@ -2,7 +2,6 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../../core/config/agora_config.dart';
 import '../../domain/models/call_state.dart';
 import '../providers/video_call_provider.dart';
@@ -72,8 +71,10 @@ class _VideoCallPageState extends ConsumerState<VideoCallPage> {
                 onToggleMicrophone: () => controller.toggleMicrophone(),
                 onToggleCamera: () => controller.toggleCamera(),
                 onSwitchCamera: () => controller.switchCamera(),
+                onToggleSpeaker: () => controller.toggleSpeaker(),
                 isMuted: controller.isMuted,
                 isCameraEnabled: controller.isCameraEnabled,
+                isSpeakerEnabled: controller.isSpeakerEnabled,
               ),
             ),
 

@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../video_call/domain/models/call_state.dart';
-import '../../../video_call/presentation/pages/video_call_page.dart';
 import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
 
@@ -482,11 +482,7 @@ class AppointmentCard extends StatelessWidget {
       scheduledTime: consultation.scheduledTime,
     );
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => VideoCallPage(callInfo: callInfo),
-      ),
-    );
+    context.push('/video-call', extra: callInfo);
   }
 }
 
