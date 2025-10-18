@@ -100,6 +100,8 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Auto scroll when new messages arrive
     ref.listen<ChatState>(chatProvider, (previous, next) {
@@ -109,10 +111,10 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: const Text('AI Health Assistant'),
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         actions: [
@@ -168,14 +170,14 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
                         Icon(
                           Icons.chat_bubble_outline,
                           size: 64,
-                          color: Colors.grey.shade400,
+                          color: colorScheme.onSurface.withOpacity(0.3),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Start a conversation',
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.grey.shade600,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -206,14 +208,17 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).colorScheme.primary,
+                        colorScheme.primary,
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
+                  Text(
                     'Analyzing your symptoms...',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
                 ],
               ),
