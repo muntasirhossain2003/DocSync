@@ -11,6 +11,7 @@ class Doctor {
   final DateTime? availabilityEnd;
   final String? bio;
   final DateTime createdAt;
+  final bool isAvailable; // Doctor's availability status from database
 
   // User details from joined table
   final String fullName;
@@ -28,6 +29,7 @@ class Doctor {
     this.availabilityEnd,
     this.bio,
     required this.createdAt,
+    required this.isAvailable,
     required this.fullName,
     this.profilePictureUrl,
     required this.email,
@@ -49,6 +51,7 @@ class Doctor {
           : null,
       bio: json['bio'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      isAvailable: json['is_available'] as bool? ?? false,
       // User details from joined table
       fullName: json['users']?['full_name'] as String? ?? 'Doctor',
       profilePictureUrl: json['users']?['profile_picture_url'] as String?,
@@ -71,9 +74,12 @@ class Doctor {
     };
   }
 
+  // Getter that returns the database is_available field
+  // This is calculated on the backend based on:
+  // - is_online = true (doctor is currently online)
+  // OR
+  // - availability schedule is set (doctor has defined working hours)
   bool get isAvailableNow {
-    if (availabilityStart == null || availabilityEnd == null) return false;
-    final now = DateTime.now();
-    return now.isAfter(availabilityStart!) && now.isBefore(availabilityEnd!);
+    return isAvailable;
   }
 }

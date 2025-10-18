@@ -54,9 +54,10 @@ class ProfileHeader extends ConsumerWidget {
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        const Text('Care Plan: Basic'),
         const SizedBox(height: 12),
-        OutlinedButton(onPressed: () {}, child: const Text('Manage Plan')),
+        OutlinedButton(onPressed: () {
+          context.push('/profile/subscription');
+        }, child: const Text('Manage Plan')),
       ],
     );
   }
@@ -67,32 +68,26 @@ class ProfileList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
-        const ListTile(
-          leading: Icon(Icons.group),
-          title: Text('Family Members'),
-        ),
-        const Divider(),
-        const ListTile(
+        ListTile(leading: Icon(Icons.group), title: Text('Family Members')),
+        Divider(),
+        ListTile(
           leading: Icon(Icons.workspace_premium),
           title: Text('Subscriptions & Care Plans'),
         ),
-        const ListTile(leading: Icon(Icons.language), title: Text('Language')),
-        const ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
-        const Divider(),
-        const ListTile(
+        ListTile(leading: Icon(Icons.language), title: Text('Language')),
+        ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
+        Divider(),
+        ListTile(
           leading: Icon(Icons.privacy_tip),
           title: Text('Privacy Policy'),
         ),
-        const ListTile(
+        ListTile(
           leading: Icon(Icons.description),
           title: Text('Terms of Service'),
         ),
-        const ListTile(
-          leading: Icon(Icons.help),
-          title: Text('Help & Support'),
-        ),
+        ListTile(leading: Icon(Icons.help), title: Text('Help & Support')),
       ],
     );
   }
@@ -106,7 +101,10 @@ class SignOutButton extends StatelessWidget {
     return FilledButton.icon(
       onPressed: () async {
         await Supabase.instance.client.auth.signOut();
-        if (context.mounted) context.go('/login');
+        if (context.mounted) {
+          Navigator.pop(context);
+          context.go('/login');
+        }
       },
       icon: const Icon(Icons.logout),
       label: const Text('Sign out'),

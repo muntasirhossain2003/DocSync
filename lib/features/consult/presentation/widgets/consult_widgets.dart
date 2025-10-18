@@ -1,9 +1,12 @@
 // lib/features/consult/presentation/widgets/consult_widgets.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/theme/theme.dart';
 import '../../../home/presentation/providers/consultation_provider.dart';
+import '../../../video_call/domain/models/call_state.dart';
 import '../../data/repositories/doctor_repository.dart';
 import '../../domain/models/doctor.dart';
 import '../providers/doctor_provider.dart';
@@ -11,21 +14,107 @@ import '../providers/doctor_provider.dart';
 class ConsultSearchBar extends ConsumerWidget {
   const ConsultSearchBar({super.key});
 
+  void _showFilterSheet(BuildContext context, WidgetRef ref) {
+    final specializations = ref.read(specializationsProvider);
+    final selected = ref.read(selectedSpecializationProvider);
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Filter by Specialization',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FilterChip(
+                    label: const Text('All'),
+                    selected: selected == null,
+                    onSelected: (_) {
+                      ref.read(selectedSpecializationProvider.notifier).state =
+                          null;
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ...specializations.map((spec) {
+                    return FilterChip(
+                      label: Text(spec),
+                      selected: selected == spec,
+                      onSelected: (_) {
+                        ref
+                                .read(selectedSpecializationProvider.notifier)
+                                .state =
+                            spec;
+                        Navigator.pop(context);
+                      },
+                    );
+                  }),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedSpecializationProvider);
+
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: TextField(
-        onChanged: (value) {
-          ref.read(searchQueryProvider.notifier).state = value;
-        },
-        decoration: InputDecoration(
-          hintText: 'Search doctors, specialization... ',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.grey.shade50,
-        ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              onChanged: (value) {
+                ref.read(searchQueryProvider.notifier).state = value;
+              },
+              decoration: InputDecoration(
+                hintText: 'Search doctors, specialization...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: AppColors.light_blue,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            height: 56,
+            decoration: BoxDecoration(
+              color: selected != null ? Colors.indigo : Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: selected != null ? Colors.indigo : Colors.grey.shade300,
+              ),
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.filter_list,
+                color: selected != null ? Colors.white : Colors.grey.shade700,
+              ),
+              onPressed: () => _showFilterSheet(context, ref),
+              tooltip: 'Filter by specialization',
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -228,24 +317,23 @@ class DoctorCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Icons.attach_money,
+                  Icons.payments_outlined,
                   size: 18,
                   color: Colors.indigo.shade700,
                 ),
-                Text(
-                  '৳${doctor.consultationFee.toStringAsFixed(0)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo.shade700,
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    '৳${doctor.consultationFee.toStringAsFixed(0)} /consultation',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo.shade700,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  '/consultation',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                const Spacer(),
+                const SizedBox(width: 8),
 
                 // Action Buttons
                 OutlinedButton.icon(
@@ -254,22 +342,22 @@ class DoctorCard extends StatelessWidget {
                   label: const Text('Book'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: 10,
+                      vertical: 6,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 ElevatedButton.icon(
                   onPressed: doctor.isAvailableNow
                       ? () => _instantCall(context, doctor)
                       : null,
-                  icon: const Icon(Icons.video_call, size: 18),
-                  label: const Text('Call Now'),
+                  icon: const Icon(Icons.video_call, size: 16),
+                  label: const Text('Call'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: 10,
+                      vertical: 6,
                     ),
                   ),
                 ),
@@ -282,24 +370,23 @@ class DoctorCard extends StatelessWidget {
   }
 
   void _bookConsultation(BuildContext context, Doctor doctor) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => BookConsultationSheet(doctor: doctor),
-    );
+    // Navigate to booking page
+    context.push('/booking', extra: doctor);
   }
 
   void _instantCall(BuildContext context, Doctor doctor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Starting video call with Dr. ${doctor.fullName}...'),
-        backgroundColor: Colors.green,
-      ),
+    // Create a temporary consultation for instant call
+    final callInfo = VideoCallInfo(
+      consultationId: 'instant_${DateTime.now().millisecondsSinceEpoch}',
+      doctorId: doctor.id,
+      doctorName: doctor.fullName,
+      doctorProfileUrl: doctor.profilePictureUrl,
+      patientId: '',
+      patientName: '',
+      scheduledTime: DateTime.now(),
     );
-    // TODO: Implement video call functionality
+
+    context.push('/video-call', extra: callInfo);
   }
 
   bool _isValidImageUrl(String? url) {
@@ -432,36 +519,12 @@ class _BookConsultationSheetState extends ConsumerState<BookConsultationSheet> {
             ],
           ),
           const Divider(height: 32),
-
-          // Consultation Type
-          const Text(
-            'Consultation Type',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
           const SizedBox(height: 8),
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(
-                value: 'video',
-                label: Text('Video'),
-                icon: Icon(Icons.videocam),
-              ),
-              ButtonSegment(
-                value: 'audio',
-                label: Text('Audio'),
-                icon: Icon(Icons.call),
-              ),
-              ButtonSegment(
-                value: 'chat',
-                label: Text('Chat'),
-                icon: Icon(Icons.chat),
-              ),
-            ],
-            selected: {consultationType},
-            onSelectionChanged: (Set<String> selection) {
-              setState(() => consultationType = selection.first);
-            },
+          const Text(
+            'Consultation Type: Video Consultation',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
+
           const SizedBox(height: 20),
 
           // Date Selection
@@ -517,6 +580,40 @@ class _BookConsultationSheetState extends ConsumerState<BookConsultationSheet> {
           ),
           const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+}
+
+class ConsultFilterBar extends ConsumerWidget {
+  const ConsultFilterBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final specializations = ref.watch(specializationsProvider);
+    final selected = ref.watch(selectedSpecializationProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: DropdownButtonFormField<String>(
+        value: selected,
+        hint: const Text('Filter by specialization'),
+        isExpanded: true,
+        decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.filter_list),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.grey.shade50,
+        ),
+        items: [
+          const DropdownMenuItem(value: null, child: Text('All')),
+          ...specializations.map(
+            (spec) => DropdownMenuItem(value: spec, child: Text(spec)),
+          ),
+        ],
+        onChanged: (value) {
+          ref.read(selectedSpecializationProvider.notifier).state = value;
+        },
       ),
     );
   }

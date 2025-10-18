@@ -7,10 +7,20 @@ import '../../features/ai_assistant/presentation/pages/ai_assistant_page.dart';
 import '../../features/auth/presentation/pages/log_in.dart';
 import '../../features/auth/presentation/pages/register.dart';
 import '../../features/auth/presentation/provider/auth_provider.dart';
+import '../../features/booking/domain/models/consultation.dart';
+import '../../features/booking/presentation/pages/booking_page.dart';
+import '../../features/booking/presentation/pages/checkout_page.dart';
+import '../../features/consult/domain/models/doctor.dart';
 import '../../features/consult/presentation/pages/consult_page.dart';
 import '../../features/health/presentation/pages/health_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/subscription/domain/entities/subscription_plan.dart';
+import '../../features/subscription/pages/checkout_page.dart' as sub_checkout;
+import '../../features/subscription/pages/subscription_page.dart';
+import '../../features/subscription/pages/subscription_plan.dart';
+import '../../features/video_call/domain/models/call_state.dart';
+import '../../features/video_call/presentation/pages/video_call_page.dart';
 import '../../shared/widgets/splash_screen.dart';
 import '../widgets/patient_shell.dart';
 
@@ -29,19 +39,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   String? redirect(BuildContext context, GoRouterState state) {
     final session = Supabase.instance.client.auth.currentSession;
     final isLoggedIn = session != null;
-    final isAuthRoute =
-        state.matchedLocation == '/login' ||
-        state.matchedLocation == '/register';
-    final isSplash = state.matchedLocation == '/splash';
+    final location = state.matchedLocation;
 
-    if (isSplash) return null; // allow splash to decide
+    // Allow splash screen to handle its own logic
+    if (location == '/splash') return null;
 
-    if (!isLoggedIn && !isAuthRoute) {
+    // If not logged in and not on auth pages, redirect to login
+    if (!isLoggedIn && location != '/login' && location != '/register') {
       return '/login';
     }
-    if (isLoggedIn && isAuthRoute) {
+
+    // If logged in and on auth pages, redirect to home
+    if (isLoggedIn && (location == '/login' || location == '/register')) {
       return '/home';
     }
+
+    // Otherwise, allow the navigation
     return null;
   }
 
@@ -58,6 +71,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+
+      // Video Call Route (outside shell - no bottom navigation)
+      GoRoute(
+        path: '/video-call',
+        builder: (context, state) {
+          final callInfo = state.extra as VideoCallInfo;
+          return VideoCallPage(callInfo: callInfo);
+        },
+      ),
+  
+
+      // Booking Route (outside shell - no bottom navigation)
+      GoRoute(
+        path: '/booking',
+        builder: (context, state) {
+          final doctor = state.extra as Doctor;
+          return BookingPage(doctor: doctor);
+        },
+        routes: [
+          GoRoute(
+            path: 'checkout',
+            builder: (context, state) {
+              final consultation = state.extra as Consultation;
+              return CheckoutPage(consultation: consultation);
+            },
+          ),
+        ],
       ),
 
       // Patient Shell with 5 tabs
@@ -107,6 +148,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/profile',
                 builder: (context, state) => const ProfilePage(),
+                routes: [
+                  GoRoute(
+                    path: 'subscription',
+                    builder: (context, state) => const SubscriptionStatusPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'plans',
+                        builder: (context, state) =>
+                            const SubscriptionPlansPage(),
+                        routes: [
+                          GoRoute(
+                            path: 'checkout',
+                            builder: (context, state) {
+                              final plan = state.extra as SubscriptionPlan;
+                              return sub_checkout.SubscriptionCheckoutPage(
+                                plan: plan,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

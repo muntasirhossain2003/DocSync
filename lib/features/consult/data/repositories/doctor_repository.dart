@@ -21,17 +21,13 @@ class DoctorRepository {
           ''')
           .order('created_at', ascending: false);
 
-      print('Fetched ${(response as List).length} doctors');
       final doctors = (response).map((json) {
-        final doctor = Doctor.fromJson(json as Map<String, dynamic>);
-        print(
-          'Doctor: ${doctor.fullName}, ID: ${doctor.id}, UserID: ${doctor.userId}',
-        );
+        final doctor = Doctor.fromJson(json);
         return doctor;
       }).toList();
       return doctors;
     } catch (e) {
-      print('Error fetching doctors: $e');
+      
       throw Exception('Failed to fetch doctors: $e');
     }
   }
@@ -43,24 +39,16 @@ class DoctorRepository {
         return fetchAllDoctors();
       }
 
-      final response = await _supabase
-          .from('doctors')
-          .select('''
-            *,
-            users!inner (
-              full_name,
-              email,
-              profile_picture_url
-            )
-          ''')
-          .or('specialization.ilike.%$query%,users.full_name.ilike.%$query%')
-          .order('created_at', ascending: false);
+      // Fetch all doctors and filter in memory since we can't use OR on joined tables
+      final allDoctors = await fetchAllDoctors();
+      final lowerQuery = query.toLowerCase();
 
-      return (response as List)
-          .map((json) => Doctor.fromJson(json as Map<String, dynamic>))
-          .toList();
+      return allDoctors.where((doctor) {
+        return doctor.fullName.toLowerCase().contains(lowerQuery) ||
+            doctor.specialization.toLowerCase().contains(lowerQuery) ||
+            (doctor.qualification?.toLowerCase().contains(lowerQuery) ?? false);
+      }).toList();
     } catch (e) {
-      print('Error searching doctors: $e');
       throw Exception('Failed to search doctors: $e');
     }
   }
@@ -87,7 +75,6 @@ class DoctorRepository {
           .map((json) => Doctor.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print('Error fetching doctors by specialization: $e');
       throw Exception('Failed to fetch doctors by specialization: $e');
     }
   }
@@ -108,9 +95,9 @@ class DoctorRepository {
           .eq('id', doctorId)
           .single();
 
-      return Doctor.fromJson(response as Map<String, dynamic>);
+      return Doctor.fromJson(response);
     } catch (e) {
-      print('Error fetching doctor by ID: $e');
+
       return null;
     }
   }
@@ -129,7 +116,7 @@ class DoctorRepository {
             'patient_id': patientId,
             'doctor_id': doctorId,
             'consultation_type': consultationType,
-            'scheduled_time': scheduledTime.toIso8601String(),
+            'scheduled_time': scheduledTime.toUtc().toIso8601String(),
             'consultation_status': 'scheduled',
           })
           .select()
@@ -137,7 +124,7 @@ class DoctorRepository {
 
       return response['id'] as String;
     } catch (e) {
-      print('Error booking consultation: $e');
+      
       throw Exception('Failed to book consultation: $e');
     }
   }
@@ -164,7 +151,6 @@ class DoctorRepository {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching user consultations: $e');
       throw Exception('Failed to fetch consultations: $e');
     }
   }

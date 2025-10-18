@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,36 +15,71 @@ class PatientShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       drawer: const _PatientDrawer(),
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: _goBranch,
-        destinations: const [
+        backgroundColor: colorScheme.secondaryContainer,
+        indicatorColor: Colors.transparent,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+            icon: Icon(
+              FluentIcons.home_24_regular,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            selectedIcon: Icon(
+              FluentIcons.home_24_filled,
+              color: colorScheme.primary,
+            ),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.medical_services_outlined),
-            selectedIcon: Icon(Icons.medical_services),
+            icon: Icon(
+              FluentIcons.stethoscope_24_regular,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            selectedIcon: Icon(
+              FluentIcons.stethoscope_24_filled,
+              color: colorScheme.primary,
+            ),
             label: 'Consult',
           ),
           NavigationDestination(
-            icon: Icon(Icons.psychology_outlined),
-            selectedIcon: Icon(Icons.psychology),
+            icon: Icon(
+              FluentIcons.brain_circuit_24_regular,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            selectedIcon: Icon(
+              FluentIcons.brain_circuit_24_filled,
+              color: colorScheme.primary,
+            ),
             label: 'AI',
           ),
           NavigationDestination(
-            icon: Icon(Icons.health_and_safety_outlined),
-            selectedIcon: Icon(Icons.health_and_safety),
+            icon: Icon(
+              FluentIcons.heart_pulse_24_regular,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            selectedIcon: Icon(
+              FluentIcons.heart_pulse_24_filled,
+              color: colorScheme.primary,
+            ),
             label: 'Health',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
+            icon: Icon(
+              FluentIcons.person_24_regular,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            selectedIcon: Icon(
+              FluentIcons.person_24_filled,
+              color: colorScheme.primary,
+            ),
             label: 'Profile',
           ),
         ],
@@ -57,35 +93,74 @@ class _PatientDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Drawer(
+      backgroundColor: colorScheme.surface,
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(8),
           children: [
-            const ListTile(
-              leading: Icon(Icons.notifications),
-              title: Text('Notifications & Reminders'),
+            ListTile(
+              leading: Icon(
+                FluentIcons.alert_24_regular,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                'Notifications & Reminders',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             ),
-            const ListTile(
-              leading: Icon(Icons.workspace_premium),
-              title: Text('Subscription Plans'),
+            ListTile(
+              leading: Icon(
+                FluentIcons.premium_24_regular,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                'Subscription Plans',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             ),
-            const ListTile(
-              leading: Icon(Icons.payment),
-              title: Text('Payment History'),
+            ListTile(
+              leading: Icon(
+                FluentIcons.payment_24_regular,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                'Payment History',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             ),
-            const Divider(),
-            const ListTile(
-              leading: Icon(Icons.privacy_tip),
-              title: Text('Privacy Policy'),
+            Divider(color: colorScheme.outlineVariant),
+            ListTile(
+              leading: Icon(
+                FluentIcons.shield_lock_24_regular,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                'Privacy Policy',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             ),
-            const ListTile(
-              leading: Icon(Icons.description),
-              title: Text('Terms'),
+            ListTile(
+              leading: Icon(
+                FluentIcons.document_text_24_regular,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                'Terms',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             ),
-            const ListTile(
-              leading: Icon(Icons.help),
-              title: Text('Help & Support'),
+            ListTile(
+              leading: Icon(
+                FluentIcons.question_circle_24_regular,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                'Help & Support',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             ),
           ],
         ),

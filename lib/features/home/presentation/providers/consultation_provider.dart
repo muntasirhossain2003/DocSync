@@ -1,6 +1,8 @@
 // lib/features/home/presentation/providers/consultation_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../auth/presentation/provider/auth_provider.dart';
 import '../../../consult/data/repositories/doctor_repository.dart';
 import '../../../consult/domain/models/doctor.dart';
 
@@ -34,6 +36,8 @@ class ConsultationWithDoctor {
 // Provider to fetch upcoming consultations for current user
 final upcomingConsultationsProvider =
     FutureProvider<List<ConsultationWithDoctor>>((ref) async {
+      // Re-run when auth state changes
+      ref.watch(authStateProvider);
       final supabase = Supabase.instance.client;
       final authUserId = supabase.auth.currentUser?.id;
 
@@ -42,8 +46,6 @@ final upcomingConsultationsProvider =
       }
 
       try {
-        print('Auth User ID: $authUserId');
-
         // First get the user's ID from users table
         final userResponse = await supabase
             .from('users')
@@ -52,8 +54,6 @@ final upcomingConsultationsProvider =
             .single();
 
         final userId = userResponse['id'] as String;
-        print('User ID from users table: $userId');
-        print('Current time for filter: ${DateTime.now().toIso8601String()}');
 
         // Fetch upcoming consultations
         final response = await supabase
@@ -72,6 +72,7 @@ final upcomingConsultationsProvider =
             consultation_fee,
             availability_start,
             availability_end,
+            is_available,
             bio,
             created_at,
             users!inner (
@@ -83,7 +84,7 @@ final upcomingConsultationsProvider =
         ''')
             .eq('patient_id', userId)
             .eq('consultation_status', 'scheduled')
-            .gte('scheduled_time', DateTime.now().toIso8601String())
+            .gte('scheduled_time', DateTime.now().toUtc().toIso8601String())
             .order('scheduled_time', ascending: true)
             .limit(5);
 
@@ -91,14 +92,9 @@ final upcomingConsultationsProvider =
         print('Fetched ${(response as List).length} upcoming consultations');
 
         return (response)
-            .map(
-              (json) =>
-                  ConsultationWithDoctor.fromJson(json as Map<String, dynamic>),
-            )
+            .map((json) => ConsultationWithDoctor.fromJson(json))
             .toList();
-      } catch (e, stackTrace) {
-        print('Error fetching upcoming consultations: $e');
-        print('Stack trace: $stackTrace');
+      } catch (e) {
         return [];
       }
     });
@@ -108,8 +104,6 @@ final topDoctorsProvider = FutureProvider<List<Doctor>>((ref) async {
   final repository = DoctorRepository();
 
   try {
-    // Fetch all doctors and return top ones
-    // In a real app, you'd have a rating system in the database
     final doctors = await repository.fetchAllDoctors();
 
     // Return first 5 doctors as "top doctors"
