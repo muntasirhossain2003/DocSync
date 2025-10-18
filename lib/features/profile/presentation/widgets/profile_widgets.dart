@@ -53,11 +53,6 @@ class ProfileHeader extends ConsumerWidget {
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
-        const SizedBox(height: 12),
-        OutlinedButton(onPressed: () {
-          context.push('/profile/subscription');
-        }, child: const Text('Manage Plan')),
       ],
     );
   }
@@ -68,26 +63,30 @@ class ProfileList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        ListTile(leading: Icon(Icons.group), title: Text('Family Members')),
-        Divider(),
         ListTile(
-          leading: Icon(Icons.workspace_premium),
-          title: Text('Subscriptions & Care Plans'),
+          leading: const Icon(Icons.workspace_premium),
+          title: const Text('Subscriptions & Care Plans'),
+          onTap: () {
+            context.push('/profile/subscription');
+          },
         ),
-        ListTile(leading: Icon(Icons.language), title: Text('Language')),
-        ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
-        Divider(),
-        ListTile(
+        const ListTile(leading: Icon(Icons.language), title: Text('Language')),
+        const ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
+        const Divider(),
+        const ListTile(
           leading: Icon(Icons.privacy_tip),
           title: Text('Privacy Policy'),
         ),
-        ListTile(
+        const ListTile(
           leading: Icon(Icons.description),
           title: Text('Terms of Service'),
         ),
-        ListTile(leading: Icon(Icons.help), title: Text('Help & Support')),
+        const ListTile(
+          leading: Icon(Icons.help),
+          title: Text('Help & Support'),
+        ),
       ],
     );
   }
