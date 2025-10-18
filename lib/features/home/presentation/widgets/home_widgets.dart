@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/theme/app_constants.dart';
 import '../../../video_call/domain/models/call_state.dart';
 import '../pages/all_categories_page.dart';
+import '../pages/all_top_doctors_page.dart';
 import '../pages/doctors_by_specialty_page.dart';
 import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
@@ -513,6 +514,7 @@ class CategoriesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       children: [
@@ -537,51 +539,57 @@ class CategoriesSection extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 6),
         categoriesAsync.when(
           data: (categories) {
             if (categories.isEmpty) {
               return Container(
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
                   child: Text(
                     'No categories available',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
                 ),
               );
             }
 
-            return SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length > 8 ? 8 : categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: GestureDetector(
-                      onTap: () => _showDoctorsBySpecialty(context, category),
-                      child: CategoryCard(
-                        icon: category.icon,
-                        label: category.label,
-                        color: category.color,
-                      ),
-                    ),
-                  );
-                },
+            // Show only first 6 categories in 2x3 grid
+            final displayCategories = categories.take(6).toList();
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 1.1,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
               ),
+              itemCount: displayCategories.length,
+              itemBuilder: (context, index) {
+                final category = displayCategories[index];
+                return GestureDetector(
+                  onTap: () => _showDoctorsBySpecialty(context, category),
+                  child: CategoryCard(
+                    icon: category.icon,
+                    label: category.label,
+                    color: category.color,
+                  ),
+                );
+              },
             );
           },
           loading: () => Container(
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(child: CircularProgressIndicator()),
@@ -589,7 +597,7 @@ class CategoriesSection extends ConsumerWidget {
           error: (error, stack) => Container(
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.red[50],
+              color: Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
@@ -628,38 +636,32 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      width: 80,
-      height: 100,
-      child: Column(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Center(child: Icon(icon, color: color, size: 28)),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 45,
+          height: 45,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
-          const SizedBox(height: 6),
-          SizedBox(
-            height: 32, // Fixed height for text area
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-                height: 1.1,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+          child: Center(child: Icon(icon, color: color, size: 22)),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 9.5,
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
+            height: 1.1,
           ),
-        ],
-      ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }
@@ -681,7 +683,14 @@ class TopDoctorsSection extends StatelessWidget {
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AllTopDoctorsPage(),
+                  ),
+                );
+              },
               child: Text(
                 'See All',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
