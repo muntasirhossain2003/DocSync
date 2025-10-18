@@ -72,20 +72,39 @@ class ProfileList extends StatelessWidget {
             context.push('/profile/subscription');
           },
         ),
-        const ListTile(leading: Icon(Icons.language), title: Text('Language')),
-        const ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
+        const ListTile(
+          leading: Icon(Icons.language),
+          title: Text('Language'),
+          // Language functionality to be implemented later
+        ),
+        ListTile(
+          leading: const Icon(Icons.settings),
+          title: const Text('Settings'),
+          onTap: () {
+            context.push('/profile/settings');
+          },
+        ),
         const Divider(),
-        const ListTile(
-          leading: Icon(Icons.privacy_tip),
-          title: Text('Privacy Policy'),
+        ListTile(
+          leading: const Icon(Icons.privacy_tip),
+          title: const Text('Privacy Policy'),
+          onTap: () {
+            context.push('/profile/privacy-policy');
+          },
         ),
-        const ListTile(
-          leading: Icon(Icons.description),
-          title: Text('Terms of Service'),
+        ListTile(
+          leading: const Icon(Icons.description),
+          title: const Text('Terms of Service'),
+          onTap: () {
+            context.push('/profile/terms-of-service');
+          },
         ),
-        const ListTile(
-          leading: Icon(Icons.help),
-          title: Text('Help & Support'),
+        ListTile(
+          leading: const Icon(Icons.help),
+          title: const Text('Help & Support'),
+          onTap: () {
+            context.push('/profile/help-support');
+          },
         ),
       ],
     );

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'core/routing/router.dart';
+
 import './core/theme/app_theme.dart';
+import './core/theme/theme_provider.dart';
+import 'core/routing/router.dart';
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -17,25 +20,22 @@ class MyApp extends ConsumerWidget {
     }
 
     return FutureBuilder(
-      future: Supabase.initialize(
-        url: supabaseUrl,
-        anonKey: supabaseAnonKey,
-      ),
+      future: Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
           );
         }
 
         final router = ref.watch(appRouterProvider);
+        final themeMode = ref.watch(themeModeProvider);
 
         return MaterialApp.router(
           title: 'DocSync',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
           routerConfig: router,
         );
       },

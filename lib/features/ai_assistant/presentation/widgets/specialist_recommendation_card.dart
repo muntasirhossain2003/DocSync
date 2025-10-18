@@ -82,12 +82,15 @@ class SpecialistRecommendationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _getColorForSpecialization(specialization);
     final icon = _getIconForSpecialization(specialization);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Material(
         elevation: 3,
         borderRadius: BorderRadius.circular(16),
+        color: isDark ? colorScheme.surfaceContainerHighest : Colors.white,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
@@ -96,7 +99,12 @@ class SpecialistRecommendationCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               gradient: LinearGradient(
-                colors: [color.withOpacity(0.1), Colors.white],
+                colors: isDark
+                    ? [
+                        color.withOpacity(0.2),
+                        colorScheme.surfaceContainerHighest,
+                      ]
+                    : [color.withOpacity(0.1), Colors.white],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -110,7 +118,7 @@ class SpecialistRecommendationCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: color.withOpacity(isDark ? 0.25 : 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: FaIcon(icon, color: color, size: 24),
@@ -132,7 +140,7 @@ class SpecialistRecommendationCard extends StatelessWidget {
                                 'Recommended Specialist',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey[600],
+                                  color: colorScheme.onSurface.withOpacity(0.7),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -147,7 +155,9 @@ class SpecialistRecommendationCard extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: color,
+                                    color: isDark
+                                        ? color.withOpacity(0.9)
+                                        : color,
                                   ),
                                 ),
                               ),
@@ -192,16 +202,25 @@ class SpecialistRecommendationCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: isDark
+                          ? Colors.blue.withOpacity(0.15)
+                          : Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.blue.shade100, width: 1),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.blue.withOpacity(0.3)
+                            : Colors.blue.shade100,
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
                           Icons.lightbulb_outline,
-                          color: Colors.blue.shade700,
+                          color: isDark
+                              ? Colors.blue.shade300
+                              : Colors.blue.shade700,
                           size: 18,
                         ),
                         const SizedBox(width: 8),
@@ -214,7 +233,9 @@ class SpecialistRecommendationCard extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.blue.shade900,
+                                  color: isDark
+                                      ? Colors.blue.shade200
+                                      : Colors.blue.shade900,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -222,7 +243,9 @@ class SpecialistRecommendationCard extends StatelessWidget {
                                 reasoning!,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.blue.shade700,
+                                  color: isDark
+                                      ? Colors.blue.shade300
+                                      : Colors.blue.shade700,
                                   height: 1.4,
                                 ),
                               ),

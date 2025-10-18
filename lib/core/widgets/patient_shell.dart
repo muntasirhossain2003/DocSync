@@ -16,6 +16,7 @@ class PatientShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       drawer: const _PatientDrawer(),
@@ -23,7 +24,9 @@ class PatientShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: _goBranch,
-        backgroundColor: colorScheme.secondaryContainer,
+        backgroundColor: isDark
+            ? colorScheme.surface
+            : colorScheme.secondaryContainer,
         indicatorColor: Colors.transparent,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: [
