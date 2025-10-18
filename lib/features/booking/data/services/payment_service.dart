@@ -12,10 +12,10 @@ class PaymentService {
     try {
       final response = await _supabase
           .from('subscriptions')
-          .select('id, status, end_date')
+          .select('id, status, end_at')
           .eq('user_id', userId)
           .eq('status', 'active')
-          .gte('end_date', DateTime.now().toIso8601String())
+          .gte('end_at', DateTime.now().toIso8601String())
           .limit(1);
 
       return (response as List).isNotEmpty;
@@ -217,30 +217,78 @@ class PaymentService {
     }
   }
 
-  // Record payment in database
-  // NOTE: Currently disabled as payments table doesn't exist in database
-  // Uncomment this method when payments table is created
-  /*
+  // Map PaymentType enum to database-compatible string
+  String _mapPaymentMethodToDb(PaymentType paymentType) {
+    switch (paymentType) {
+      case PaymentType.bkash:
+        return 'bKash';
+      case PaymentType.nagad:
+        return 'Nagad';
+      case PaymentType.card:
+        return 'card';
+      case PaymentType.subscription:
+        return 'subscription';
+      case PaymentType.cash:
+        return 'cash';
+    }
+  }
+
+  // Record payment in consultation_payments table
   Future<void> recordPayment({
     required String consultationId,
     required String userId,
     required PaymentType paymentType,
     required String transactionId,
     required double amount,
+    required double originalAmount,
+    required double discountApplied,
   }) async {
     try {
-      await _supabase.from('payments').insert({
+      await _supabase.from('consultation_payments').insert({
         'consultation_id': consultationId,
         'user_id': userId,
-        'payment_type': paymentType.name,
+        'payment_method': _mapPaymentMethodToDb(paymentType),
         'transaction_id': transactionId,
         'amount': amount,
-        'status': 'completed',
+        'original_amount': originalAmount,
+        'discount_applied': discountApplied,
+        'payment_status': 'completed',
         'created_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
       throw Exception('Failed to record payment: $e');
     }
   }
-  */
+
+  // Get payment history for a user
+  Future<List<Map<String, dynamic>>> getPaymentHistory(String userId) async {
+    try {
+      final response = await _supabase
+          .from('consultation_payments')
+          .select('*, consultations(*)')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false);
+
+      return List<Map<String, dynamic>>.from(response as List);
+    } catch (e) {
+      throw Exception('Failed to fetch payment history: $e');
+    }
+  }
+
+  // Get payment by consultation ID
+  Future<Map<String, dynamic>?> getPaymentByConsultation(
+    String consultationId,
+  ) async {
+    try {
+      final response = await _supabase
+          .from('consultation_payments')
+          .select()
+          .eq('consultation_id', consultationId)
+          .maybeSingle();
+
+      return response;
+    } catch (e) {
+      return null;
+    }
+  }
 }

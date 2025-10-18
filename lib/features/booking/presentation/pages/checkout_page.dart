@@ -23,26 +23,6 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   PaymentType? _selectedPaymentMethod;
   bool _isProcessing = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Check if user has subscription and set as default
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkSubscription();
-    });
-  }
-
-  Future<void> _checkSubscription() async {
-    final hasSubscription = await ref.read(
-      hasActiveSubscriptionProvider.future,
-    );
-    if (hasSubscription && mounted) {
-      setState(() {
-        _selectedPaymentMethod = PaymentType.subscription;
-      });
-    }
-  }
-
   Future<void> _processPayment() async {
     if (_selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -128,7 +108,6 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final hasSubscriptionAsync = ref.watch(hasActiveSubscriptionProvider);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -155,39 +134,6 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               ),
             ),
             SizedBox(height: AppConstants.spacingMD),
-
-            // Show subscription option if available
-            hasSubscriptionAsync.when(
-              data: (hasSubscription) {
-                if (hasSubscription) {
-                  return Column(
-                    children: [
-                      _buildPaymentMethodCard(
-                        type: PaymentType.subscription,
-                        icon: FluentIcons.premium_24_filled,
-                        title: 'Use Subscription',
-                        subtitle: 'Free with your active subscription',
-                        colorScheme: colorScheme,
-                        textTheme: textTheme,
-                      ),
-                      SizedBox(height: AppConstants.spacingSM),
-                      Divider(color: colorScheme.outlineVariant),
-                      SizedBox(height: AppConstants.spacingSM),
-                      Text(
-                        'Or pay directly',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      SizedBox(height: AppConstants.spacingSM),
-                    ],
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-            ),
 
             // bKash
             _buildPaymentMethodCard(
@@ -524,9 +470,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     ),
                   ),
                   Text(
-                    _selectedPaymentMethod == PaymentType.subscription
-                        ? 'Free'
-                        : '৳${discountedFee.toStringAsFixed(0)}',
+                    '৳${discountedFee.toStringAsFixed(0)}',
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: hasSubscription && discountPercentage > 0
@@ -614,9 +558,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   ),
                 ),
                 Text(
-                  _selectedPaymentMethod == PaymentType.subscription
-                      ? 'Free'
-                      : '৳${widget.consultation.fee.toStringAsFixed(0)}',
+                  '৳${widget.consultation.fee.toStringAsFixed(0)}',
                   style: textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
