@@ -74,6 +74,8 @@ class ConsultSearchBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedSpecializationProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -91,7 +93,9 @@ class ConsultSearchBar extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: AppColors.light_blue,
+                fillColor: isDark
+                    ? colorScheme.surfaceContainerHighest
+                    : AppColors.light_blue,
               ),
             ),
           ),
@@ -99,16 +103,22 @@ class ConsultSearchBar extends ConsumerWidget {
           Container(
             height: 56,
             decoration: BoxDecoration(
-              color: selected != null ? Colors.indigo : Colors.grey.shade50,
+              color: selected != null
+                  ? Colors.indigo
+                  : (isDark
+                        ? colorScheme.surfaceContainerHighest
+                        : Colors.grey.shade50),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: selected != null ? Colors.indigo : Colors.grey.shade300,
+                color: selected != null
+                    ? Colors.indigo
+                    : (isDark ? colorScheme.outline : Colors.grey.shade300),
               ),
             ),
             child: IconButton(
               icon: Icon(
                 Icons.filter_list,
-                color: selected != null ? Colors.white : Colors.grey.shade700,
+                color: selected != null ? Colors.white : colorScheme.onSurface,
               ),
               onPressed: () => _showFilterSheet(context, ref),
               tooltip: 'Filter by specialization',

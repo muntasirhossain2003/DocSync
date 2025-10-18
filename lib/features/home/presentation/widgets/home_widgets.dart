@@ -626,6 +626,8 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: 80,
       height: 100,
@@ -646,10 +648,10 @@ class CategoryCard extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: colorScheme.onSurface,
                 height: 1.1,
               ),
               maxLines: 2,
@@ -733,14 +735,17 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -752,7 +757,7 @@ class DoctorCard extends StatelessWidget {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD),
+              color: colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: ClipRRect(
@@ -763,20 +768,20 @@ class DoctorCard extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: const Color(0xFFE3F2FD),
-                          child: const Icon(
+                          color: colorScheme.primaryContainer,
+                          child: Icon(
                             Icons.person,
-                            color: Colors.blue,
+                            color: colorScheme.primary,
                             size: 35,
                           ),
                         );
                       },
                     )
                   : Container(
-                      color: const Color(0xFFE3F2FD),
-                      child: const Icon(
+                      color: colorScheme.primaryContainer,
+                      child: Icon(
                         Icons.person,
-                        color: Colors.blue,
+                        color: colorScheme.primary,
                         size: 35,
                       ),
                     ),
@@ -789,16 +794,19 @@ class DoctorCard extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$specialty • $hospital',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -810,20 +818,23 @@ class DoctorCard extends StatelessWidget {
                         size: 14,
                         color: index < rating.floor()
                             ? Colors.amber
-                            : Colors.grey[300],
+                            : colorScheme.onSurface.withOpacity(0.3),
                       ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       '($reviews)',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          const Icon(Icons.more_vert, color: Colors.grey),
+          Icon(Icons.more_vert, color: colorScheme.onSurface.withOpacity(0.5)),
         ],
       ),
     );

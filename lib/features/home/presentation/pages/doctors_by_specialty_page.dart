@@ -26,14 +26,15 @@ class DoctorsBySpecialtyPage extends ConsumerWidget {
     final doctorsAsync = ref.watch(
       doctorsBySpecialtyProvider(category.specialization),
     );
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -41,8 +42,8 @@ class DoctorsBySpecialtyPage extends ConsumerWidget {
           children: [
             Text(
               category.label,
-              style: const TextStyle(
-                color: Colors.black87,
+              style: TextStyle(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -51,7 +52,7 @@ class DoctorsBySpecialtyPage extends ConsumerWidget {
               Text(
                 category.description!,
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
                 ),
@@ -80,22 +81,25 @@ class DoctorsBySpecialtyPage extends ConsumerWidget {
                   Icon(
                     Icons.medical_services_outlined,
                     size: 80,
-                    color: Colors.grey[400],
+                    color: colorScheme.onSurface.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No ${category.label} Available',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Currently, there are no doctors\navailable in this specialty.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
@@ -168,15 +172,18 @@ class DoctorsBySpecialtyPage extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(
+        loading: () => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
               Text(
                 'Loading doctors...',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+                style: TextStyle(
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -189,19 +196,22 @@ class DoctorsBySpecialtyPage extends ConsumerWidget {
               children: [
                 Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Error Loading Doctors',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   error.toString(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(
+                    color: colorScheme.onSurface.withOpacity(0.6),
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(

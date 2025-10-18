@@ -18,11 +18,7 @@ class SettingsPage extends ConsumerWidget {
             padding: EdgeInsets.all(16.0),
             child: Text(
               'Appearance',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
           ListTile(
@@ -51,11 +47,7 @@ class SettingsPage extends ConsumerWidget {
             padding: EdgeInsets.all(16.0),
             child: Text(
               'Other Settings',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
           ListTile(
