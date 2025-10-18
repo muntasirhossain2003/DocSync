@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../../../core/theme/app_constants.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../video_call/domain/models/call_state.dart';

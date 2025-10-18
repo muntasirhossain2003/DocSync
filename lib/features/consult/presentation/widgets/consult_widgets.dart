@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/theme.dart';
 import '../../../home/presentation/providers/consultation_provider.dart';
-import '../../../video_call/domain/models/call_state.dart';
 import '../../data/repositories/doctor_repository.dart';
 import '../../domain/models/doctor.dart';
 import '../providers/doctor_provider.dart';
@@ -343,31 +342,17 @@ class DoctorCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const Spacer(),
 
                 // Action Buttons
                 OutlinedButton.icon(
                   onPressed: () => _bookConsultation(context, doctor),
                   icon: const Icon(Icons.calendar_today, size: 16),
-                  label: const Text('Book'),
+                  label: const Text('Book Now'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                ElevatedButton.icon(
-                  onPressed: doctor.isAvailableNow
-                      ? () => _instantCall(context, doctor)
-                      : null,
-                  icon: const Icon(Icons.video_call, size: 16),
-                  label: const Text('Call'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                   ),
                 ),
@@ -382,21 +367,6 @@ class DoctorCard extends StatelessWidget {
   void _bookConsultation(BuildContext context, Doctor doctor) {
     // Navigate to booking page
     context.push('/booking', extra: doctor);
-  }
-
-  void _instantCall(BuildContext context, Doctor doctor) {
-    // Create a temporary consultation for instant call
-    final callInfo = VideoCallInfo(
-      consultationId: 'instant_${DateTime.now().millisecondsSinceEpoch}',
-      doctorId: doctor.id,
-      doctorName: doctor.fullName,
-      doctorProfileUrl: doctor.profilePictureUrl,
-      patientId: '',
-      patientName: '',
-      scheduledTime: DateTime.now(),
-    );
-
-    context.push('/video-call', extra: callInfo);
   }
 
   bool _isValidImageUrl(String? url) {

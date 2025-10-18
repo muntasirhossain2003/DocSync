@@ -39,9 +39,22 @@ final consultationNotesProvider = StateProvider<String>((ref) => '');
 // Available time slots for selected date
 final availableSlotsProvider = FutureProvider<List<BookingSlot>>((ref) async {
   final selectedDate = ref.watch(selectedDateProvider);
+  final doctor = ref.watch(selectedDoctorProvider);
 
-  // Generate slots for the selected date
-  final slots = TimeSlotGenerator.generateSlotsForDay(selectedDate);
+  if (doctor == null) {
+    return [];
+  }
+
+  // Get day-specific schedule from doctor's availability
+  final daySchedule = doctor.getScheduleForDay(selectedDate);
+
+  // Generate slots based on doctor's day-specific availability
+  final slots = TimeSlotGenerator.generateSlotsForDay(
+    selectedDate,
+    availabilityStart: doctor.availabilityStart,
+    availabilityEnd: doctor.availabilityEnd,
+    daySchedule: daySchedule,
+  );
 
   // TODO: Filter out already booked slots by checking with backend
   // For now, just return all generated slots

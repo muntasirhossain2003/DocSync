@@ -25,9 +25,10 @@ class ConsultationRepository {
             'consultation_type': type.name,
             'consultation_status':
                 'scheduled', // Use 'scheduled' as per DB schema
-            'scheduled_time': scheduledTime.toIso8601String(),
-            'created_at': DateTime.now().toIso8601String(),
-            'updated_at': DateTime.now().toIso8601String(),
+            // Store times in UTC for Supabase
+            'scheduled_time': scheduledTime.toUtc().toIso8601String(),
+            'created_at': DateTime.now().toUtc().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
           })
           .select('''
             *,
@@ -65,7 +66,7 @@ class ConsultationRepository {
           .from('consultations')
           .update({
             'consultation_status': _mapStatusToDb(status),
-            'updated_at': DateTime.now().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
           })
           .eq('id', consultationId)
           .select('''
@@ -125,7 +126,7 @@ class ConsultationRepository {
           .update({
             'consultation_status':
                 'scheduled', // Paid consultations remain scheduled
-            'updated_at': DateTime.now().toIso8601String(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
           })
           .eq('id', consultationId)
           .select('''
@@ -184,7 +185,8 @@ class ConsultationRepository {
   // Get upcoming consultations for patient
   Future<List<Consultation>> getUpcomingConsultations(String patientId) async {
     try {
-      final now = DateTime.now().toIso8601String();
+      // Use UTC 'now' for querying UTC stored timestamps
+      final now = DateTime.now().toUtc().toIso8601String();
       final response = await _supabase
           .from('consultations')
           .select('''
