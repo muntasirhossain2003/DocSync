@@ -114,10 +114,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       backgroundColor: AppColors.light_blue,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Add a small top margin so the logo sits away from the status/bar
+              const SizedBox(height: 16),
               SizedBox(
                 height: 180,
                 child: Image.asset(
@@ -125,7 +127,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               const Text(
                 'Log In',
                 style: TextStyle(

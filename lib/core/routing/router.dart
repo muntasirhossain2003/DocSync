@@ -2,22 +2,27 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../features/ai_assistant/presentation/pages/ai_assistant_page.dart';
 import '../../features/auth/presentation/pages/log_in.dart';
 import '../../features/auth/presentation/pages/register.dart';
 import '../../features/auth/presentation/provider/auth_provider.dart';
+import '../../features/booking/domain/models/consultation.dart';
+import '../../features/booking/presentation/pages/booking_page.dart';
+import '../../features/booking/presentation/pages/checkout_page.dart';
+import '../../features/consult/domain/models/doctor.dart';
 import '../../features/consult/presentation/pages/consult_page.dart';
 import '../../features/health/presentation/pages/health_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/subscription/domain/entities/subscription_plan.dart';
+import '../../features/subscription/pages/checkout_page.dart' as sub_checkout;
+import '../../features/subscription/pages/subscription_page.dart';
+import '../../features/subscription/pages/subscription_plan.dart';
 import '../../features/video_call/domain/models/call_state.dart';
 import '../../features/video_call/presentation/pages/video_call_page.dart';
 import '../../shared/widgets/splash_screen.dart';
 import '../widgets/patient_shell.dart';
-import '../../features/subscription/pages/subscription_page.dart';
-import '../../features/subscription/pages/subscription_plan.dart';
-import '../../features/subscription/pages/checkout_page.dart';
-import '../../features/subscription/domain/entities/subscription_plan.dart';
 
 class _AuthRefresh extends ChangeNotifier {
   _AuthRefresh() {
@@ -76,6 +81,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return VideoCallPage(callInfo: callInfo);
         },
       ),
+  
+
+      // Booking Route (outside shell - no bottom navigation)
+      GoRoute(
+        path: '/booking',
+        builder: (context, state) {
+          final doctor = state.extra as Doctor;
+          return BookingPage(doctor: doctor);
+        },
+        routes: [
+          GoRoute(
+            path: 'checkout',
+            builder: (context, state) {
+              final consultation = state.extra as Consultation;
+              return CheckoutPage(consultation: consultation);
+            },
+          ),
+        ],
+      ),
 
       // Patient Shell with 5 tabs
       StatefulShellRoute.indexedStack(
@@ -131,13 +155,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     routes: [
                       GoRoute(
                         path: 'plans',
-                        builder: (context, state) => const SubscriptionPlansPage(),
+                        builder: (context, state) =>
+                            const SubscriptionPlansPage(),
                         routes: [
                           GoRoute(
                             path: 'checkout',
                             builder: (context, state) {
                               final plan = state.extra as SubscriptionPlan;
-                              return SubscriptionCheckoutPage(plan: plan);
+                              return sub_checkout.SubscriptionCheckoutPage(
+                                plan: plan,
+                              );
                             },
                           ),
                         ],
@@ -146,7 +173,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   ),
                 ],
               ),
-
             ],
           ),
         ],

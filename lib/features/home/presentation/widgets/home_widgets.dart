@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../../core/theme/app_constants.dart';
 import '../../../video_call/domain/models/call_state.dart';
+import '../pages/all_categories_page.dart';
+import '../pages/doctors_by_specialty_page.dart';
 import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
 
@@ -47,10 +51,9 @@ class HomeHeader extends ConsumerWidget {
               userAsync.when(
                 data: (user) => Text(
                   'Hi, ${user?.firstName ?? 'User'}',
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 loading: () => const Text('Loading...'),
@@ -58,7 +61,9 @@ class HomeHeader extends ConsumerWidget {
               ),
               Text(
                 'How is your health?',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -90,13 +95,11 @@ class UpcomingScheduleSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Upcoming Schedule',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () {},
@@ -117,8 +120,8 @@ class UpcomingScheduleSection extends ConsumerWidget {
               return Container(
                 height: 180,
                 decoration: BoxDecoration(
-                  color: AppColors.light_blue,
-                  borderRadius: BorderRadius.circular(16),
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(AppConstants.radiusLG),
                 ),
                 child: Center(
                   child: Column(
@@ -489,361 +492,45 @@ class AppointmentCard extends StatelessWidget {
 class CategoriesSection extends ConsumerWidget {
   const CategoriesSection({super.key});
 
-  void _showAllCategories(
-    BuildContext context,
-    List<CategoryModel> categories,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Container(
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'All Medical Specialties',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GridView.builder(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.8,
-                        ),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      return GestureDetector(
-                        onTap: () {
-                          // Show doctors for this specialty
-                          _showDoctorsBySpecialty(context, category);
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: category.color.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  category.icon,
-                                  color: category.color,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              category.label,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            if (category.description != null)
-                              Text(
-                                category.description!,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[600],
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+  void _showAllCategories(BuildContext context) {
+    // Navigate to AllCategoriesPage with real data from database
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AllCategoriesPage()),
     );
   }
 
   void _showDoctorsBySpecialty(BuildContext context, CategoryModel category) {
-    // Mock data - in a real app, fetch this from API/repository
-    final doctors = [
-      DoctorBySpecialty(
-        name: 'Dr. John Smith',
-        specialization: category.specialization,
-        hospital: 'City General Hospital',
-        rating: 4.8,
-        imageUrl: '', // Use placeholder
+    // Navigate to DoctorsBySpecialtyPage with real data from database
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DoctorsBySpecialtyPage(category: category),
       ),
-      DoctorBySpecialty(
-        name: 'Dr. Sarah Johnson',
-        specialization: category.specialization,
-        hospital: 'Medical Center',
-        rating: 4.9,
-        imageUrl: '', // Use placeholder
-      ),
-      DoctorBySpecialty(
-        name: 'Dr. Robert Williams',
-        specialization: category.specialization,
-        hospital: 'University Hospital',
-        rating: 4.7,
-        imageUrl: '', // Use placeholder
-      ),
-    ];
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Container(
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: category.color.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            category.icon,
-                            color: category.color,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              category.specialization,
-                              style: Theme.of(context).textTheme.titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            if (category.description != null)
-                              Text(
-                                category.description!,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: doctors.length,
-                    itemBuilder: (context, index) {
-                      final doctor = doctors[index];
-                      final bool isValidUrl =
-                          doctor.imageUrl.isNotEmpty &&
-                          doctor.imageUrl !=
-                              'https://sasthyaseba.com/default_image_url' &&
-                          !doctor.imageUrl.contains('pravatar.cc');
-
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              // Round fixed-size image
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.grey[200],
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child: isValidUrl
-                                      ? Image.network(
-                                          doctor.imageUrl,
-                                          width: 60,
-                                          height: 60,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                                return Icon(
-                                                  Icons.person,
-                                                  color: Colors.grey[400],
-                                                  size: 30,
-                                                );
-                                              },
-                                        )
-                                      : Icon(
-                                          Icons.person,
-                                          color: Colors.grey[400],
-                                          size: 30,
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      doctor.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      doctor.hospital,
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.star,
-                                          size: 16,
-                                          color: Colors.amber,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '${doctor.rating}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              FilledButton(
-                                onPressed: () {},
-                                style: FilledButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 10,
-                                  ),
-                                ),
-                                child: const Text('Book'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categories = ref.watch(categoriesProvider);
+    final categoriesAsync = ref.watch(categoriesProvider);
 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Categories',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
-              onPressed: () => _showAllCategories(context, categories),
-              child: const Text(
+              onPressed: () => _showAllCategories(context),
+              child: Text(
                 'See All',
-                style: TextStyle(
-                  color: Color(0xFF4A90E2),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -851,22 +538,73 @@ class CategoriesSection extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: categories.length > 8 ? 8 : categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: CategoryCard(
-                  icon: category.icon,
-                  label: category.label,
-                  color: category.color,
+        categoriesAsync.when(
+          data: (categories) {
+            if (categories.isEmpty) {
+              return Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(
+                    'No categories available',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
                 ),
               );
-            },
+            }
+
+            return SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length > 8 ? 8 : categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: GestureDetector(
+                      onTap: () => _showDoctorsBySpecialty(context, category),
+                      child: CategoryCard(
+                        icon: category.icon,
+                        label: category.label,
+                        color: category.color,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+          loading: () => Container(
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stack) => Container(
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red[300]),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Failed to load categories',
+                    style: TextStyle(color: Colors.red[700], fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ],
@@ -934,20 +672,18 @@ class TopDoctorsSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Top Doctors',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text(
+              child: Text(
                 'See All',
-                style: TextStyle(
-                  color: Color(0xFF4A90E2),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1111,163 +847,198 @@ class CategoryModel {
   });
 }
 
-class DoctorBySpecialty {
-  final String name;
-  final String specialization;
-  final String hospital;
-  final double rating;
-  final String imageUrl;
+// Fetch all unique specializations from the database
+final allSpecializationsProvider = FutureProvider<List<String>>((ref) async {
+  final supabase = Supabase.instance.client;
 
-  DoctorBySpecialty({
-    required this.name,
-    required this.specialization,
-    required this.hospital,
-    required this.rating,
-    required this.imageUrl,
-  });
+  try {
+    final response = await supabase
+        .from('doctors')
+        .select('specialization')
+        .order('specialization');
+
+    // Extract unique specializations
+    final specializations = <String>{};
+    for (final row in response as List) {
+      final spec = row['specialization'] as String?;
+      if (spec != null && spec.isNotEmpty) {
+        specializations.add(spec);
+      }
+    }
+
+    return specializations.toList()..sort();
+  } catch (e) {
+    return [];
+  }
+});
+
+// Map specialization to icon and color
+IconData _getIconForSpecialization(String specialization) {
+  final lower = specialization.toLowerCase();
+
+  if (lower.contains('cardio')) return FontAwesomeIcons.heartPulse;
+  if (lower.contains('psycho') || lower.contains('psychiatr'))
+    return FontAwesomeIcons.brain;
+  if (lower.contains('patho')) return FontAwesomeIcons.vialCircleCheck;
+  if (lower.contains('pulmo') ||
+      lower.contains('respiratory') ||
+      lower.contains('chest') ||
+      lower.contains('lung'))
+    return FontAwesomeIcons.lungs;
+  if (lower.contains('pediatric') || lower.contains('neonat'))
+    return FontAwesomeIcons.baby;
+  if (lower.contains('ophthalmo') || lower.contains('eye'))
+    return FontAwesomeIcons.eye;
+  if (lower.contains('surgeon') || lower.contains('surgery'))
+    return FontAwesomeIcons.userDoctor;
+  if (lower.contains('dermat') || lower.contains('skin'))
+    return FontAwesomeIcons.bacteria;
+  if (lower.contains('gyneco') || lower.contains('obstetric'))
+    return FontAwesomeIcons.personPregnant;
+  if (lower.contains('orthoped') || lower.contains('bone'))
+    return FontAwesomeIcons.bone;
+  if (lower.contains('nutrit')) return FontAwesomeIcons.appleWhole;
+  if (lower.contains('ent') ||
+      lower.contains('otolaryng') ||
+      lower.contains('ear'))
+    return FontAwesomeIcons.earListen;
+  if (lower.contains('dent') || lower.contains('maxillofacial'))
+    return FontAwesomeIcons.tooth;
+  if (lower.contains('nephro') || lower.contains('kidney'))
+    return FontAwesomeIcons.kitMedical;
+  if (lower.contains('internal medicine') ||
+      lower.contains('medicine specialist') ||
+      lower.contains('general physician'))
+    return FontAwesomeIcons.stethoscope;
+  if (lower.contains('oncol') || lower.contains('cancer'))
+    return FontAwesomeIcons.dna;
+  if (lower.contains('gastro') ||
+      lower.contains('digest') ||
+      lower.contains('hepato') ||
+      lower.contains('colorectal'))
+    return FontAwesomeIcons.pills;
+  if (lower.contains('neuro') && !lower.contains('surgeon'))
+    return FontAwesomeIcons.brain;
+  if (lower.contains('endocrin') ||
+      lower.contains('diabetes') ||
+      lower.contains('hormone'))
+    return FontAwesomeIcons.syringe;
+  if (lower.contains('rehab') ||
+      lower.contains('physical medicine') ||
+      lower.contains('physiotherap'))
+    return FontAwesomeIcons.personWalking;
+  if (lower.contains('anesthe')) return FontAwesomeIcons.syringe;
+  if (lower.contains('urolog') || lower.contains('urinary'))
+    return FontAwesomeIcons.droplet;
+  if (lower.contains('sono') || lower.contains('radiolog'))
+    return FontAwesomeIcons.xRay;
+  if (lower.contains('hematol') || lower.contains('blood'))
+    return FontAwesomeIcons.droplet;
+  if (lower.contains('rheumat') || lower.contains('arthrit'))
+    return FontAwesomeIcons.bone;
+  if (lower.contains('infertil')) return FontAwesomeIcons.personPregnant;
+  if (lower.contains('vascular')) return FontAwesomeIcons.heartPulse;
+  if (lower.contains('critical care') || lower.contains('intensive'))
+    return FontAwesomeIcons.briefcaseMedical;
+  if (lower.contains('pain')) return FontAwesomeIcons.handHoldingMedical;
+  if (lower.contains('plastic')) return FontAwesomeIcons.scissors;
+  if (lower.contains('thoracic')) return FontAwesomeIcons.lungs;
+  if (lower.contains('family medicine')) return FontAwesomeIcons.houseMedical;
+  if (lower.contains('laparoscop')) return FontAwesomeIcons.userDoctor;
+
+  return FontAwesomeIcons.userDoctor; // Default icon
 }
 
-final categoriesProvider = Provider<List<CategoryModel>>((ref) {
-  return [
-    CategoryModel(
-      icon: FontAwesomeIcons.heartPulse,
-      label: 'Cardiology',
-      color: Colors.red,
-      specialization: 'Cardiologist',
-      description: 'Heart conditions and diseases',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.brain,
-      label: 'Psychology',
-      color: Colors.blue,
-      specialization: 'Psychologist',
-      description: 'Mental health and emotional wellbeing',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.vialCircleCheck,
-      label: 'Pathology',
-      color: Colors.purple,
-      specialization: 'Pathologist',
-      description: 'Disease diagnosis through lab tests',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.lungs,
-      label: 'Pulmonology',
-      color: Colors.orange,
-      specialization: 'Pulmonologist',
-      description: 'Respiratory system and lung diseases',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.baby,
-      label: 'Pediatrics',
-      color: Colors.teal,
-      specialization: 'Pediatrician',
-      description: 'Child and infant healthcare',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.eye,
-      label: 'Ophthalmology',
-      color: Colors.indigo,
-      specialization: 'Ophthalmologist',
-      description: 'Eye care and vision health',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.userDoctor,
-      label: 'Surgery',
-      color: Colors.red.shade800,
-      specialization: 'General Surgeon',
-      description: 'Surgical procedures and operations',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.bacteria,
-      label: 'Dermatology',
-      color: Colors.green,
-      specialization: 'Dermatologist',
-      description: 'Skin conditions and treatments',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.personPregnant,
-      label: 'Gynecology',
-      color: Colors.pinkAccent,
-      specialization: 'Gynecologist & Obstetrician',
-      description: 'Women\'s reproductive health',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.bone,
-      label: 'Orthopedics',
-      color: Colors.brown,
-      specialization: 'Orthopedist',
-      description: 'Bone, joint, and muscle health',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.appleWhole,
-      label: 'Nutrition',
-      color: Colors.lightGreen,
-      specialization: 'Clinical Nutritionist',
-      description: 'Diet and nutritional health',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.earListen,
-      label: 'ENT',
-      color: Colors.deepOrange,
-      specialization: 'Otolaryngologists (ENT)',
-      description: 'Ear, nose, and throat care',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.tooth,
-      label: 'Dentistry',
-      color: Colors.blue.shade300,
-      specialization: 'Dentist & Maxillofacial Surgeon',
-      description: 'Oral and dental health',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.kitMedical,
-      label: 'Nephrology',
-      color: Colors.amber,
-      specialization: 'Nephrologist',
-      description: 'Kidney diseases and disorders',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.stethoscope,
-      label: 'Internal Medicine',
-      color: Colors.teal.shade700,
-      specialization: 'Internal Medicine Specialist',
-      description: 'Adult diseases and conditions',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.dna,
-      label: 'Oncology',
-      color: Colors.purpleAccent,
-      specialization: 'Oncologist',
-      description: 'Cancer diagnosis and treatment',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.pills,
-      label: 'Gastroenterology',
-      color: Colors.amber.shade700,
-      specialization: 'Gastroenterologist',
-      description: 'Digestive system health',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.brain,
-      label: 'Neurology',
-      color: Colors.deepPurple,
-      specialization: 'Neurologist',
-      description: 'Brain and nervous system',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.syringe,
-      label: 'Endocrinology',
-      color: Colors.cyan,
-      specialization: 'Endocrinologist',
-      description: 'Hormone-related conditions',
-    ),
-    CategoryModel(
-      icon: FontAwesomeIcons.personWalking,
-      label: 'Rehabilitation',
-      color: Colors.blueGrey,
-      specialization: 'Rehabilitation Specialist',
-      description: 'Physical recovery and therapy',
-    ),
-  ];
+Color _getColorForSpecialization(String specialization) {
+  final lower = specialization.toLowerCase();
+
+  if (lower.contains('cardio') || lower.contains('vascular')) return Colors.red;
+  if (lower.contains('psycho') || lower.contains('psychiatr'))
+    return Colors.blue;
+  if (lower.contains('patho')) return Colors.purple;
+  if (lower.contains('pulmo') ||
+      lower.contains('respiratory') ||
+      lower.contains('chest'))
+    return Colors.orange;
+  if (lower.contains('pediatric') || lower.contains('neonat'))
+    return Colors.teal;
+  if (lower.contains('ophthalmo')) return Colors.indigo;
+  if (lower.contains('surgeon') || lower.contains('surgery'))
+    return Colors.red.shade800;
+  if (lower.contains('dermat')) return Colors.green;
+  if (lower.contains('gyneco') ||
+      lower.contains('obstetric') ||
+      lower.contains('infertil'))
+    return Colors.pinkAccent;
+  if (lower.contains('orthoped') ||
+      lower.contains('bone') ||
+      lower.contains('rheumat'))
+    return Colors.brown;
+  if (lower.contains('nutrit')) return Colors.lightGreen;
+  if (lower.contains('ent') || lower.contains('otolaryng'))
+    return Colors.deepOrange;
+  if (lower.contains('dent') || lower.contains('maxillofacial'))
+    return Colors.blue.shade300;
+  if (lower.contains('nephro') || lower.contains('urolog')) return Colors.amber;
+  if (lower.contains('internal medicine') ||
+      lower.contains('general physician'))
+    return Colors.teal.shade700;
+  if (lower.contains('oncol')) return Colors.purpleAccent;
+  if (lower.contains('gastro') ||
+      lower.contains('hepato') ||
+      lower.contains('colorectal'))
+    return Colors.amber.shade700;
+  if (lower.contains('neuro') && !lower.contains('surgeon'))
+    return Colors.deepPurple;
+  if (lower.contains('endocrin') || lower.contains('diabetes'))
+    return Colors.cyan;
+  if (lower.contains('rehab') || lower.contains('physiotherap'))
+    return Colors.blueGrey;
+  if (lower.contains('anesthe')) return Colors.grey;
+  if (lower.contains('sono') || lower.contains('radiolog'))
+    return Colors.indigo.shade300;
+  if (lower.contains('hematol')) return Colors.red.shade400;
+  if (lower.contains('critical care')) return Colors.red.shade900;
+  if (lower.contains('pain')) return Colors.orange.shade700;
+  if (lower.contains('plastic')) return Colors.pink;
+  if (lower.contains('thoracic')) return Colors.blue.shade700;
+  if (lower.contains('family medicine')) return Colors.green.shade700;
+
+  return Colors.blueAccent; // Default color
+}
+
+// Create categories from database specializations
+final categoriesProvider = FutureProvider<List<CategoryModel>>((ref) async {
+  final specializations = await ref.watch(allSpecializationsProvider.future);
+
+  return specializations.map((spec) {
+    return CategoryModel(
+      icon: _getIconForSpecialization(spec),
+      label: _formatSpecializationLabel(spec),
+      color: _getColorForSpecialization(spec),
+      specialization: spec, // Use exact database value
+      description: null,
+    );
+  }).toList();
 });
+
+// Format specialization for display (shorten long names)
+String _formatSpecializationLabel(String specialization) {
+  // Remove common suffixes for shorter display
+  String label = specialization
+      .replaceAll(' Specialist', '')
+      .replaceAll(' & ', ' & ');
+
+  // Shorten very long names
+  if (label.length > 20) {
+    // Try to abbreviate common terms
+    label = label
+        .replaceAll('Pediatric ', 'Ped. ')
+        .replaceAll('Gynecologist & Obstetrician', 'Gyn & Obs')
+        .replaceAll('Otolaryngologists (ENT)', 'ENT')
+        .replaceAll('Critical Care Medicine', 'Critical Care')
+        .replaceAll('Internal Medicine', 'Int. Medicine');
+  }
+
+  return label;
+}

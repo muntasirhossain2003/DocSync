@@ -1,5 +1,3 @@
-import 'package:http/http.dart';
-
 import '../data/datasources/subscription_datasource.dart';
 import '../domain/entities/subscription.dart';
 import '../domain/usecases/get_user_subscription.dart';

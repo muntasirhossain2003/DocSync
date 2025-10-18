@@ -67,9 +67,6 @@ class StorageService {
     required String profilePictureUrl,
   }) async {
     try {
-      print('Updating user profile picture for auth_id: $userId');
-      print('New profile picture URL: $profilePictureUrl');
-
       // First, check if user exists
       final existingUser = await _supabase
           .from('users')
@@ -79,7 +76,6 @@ class StorageService {
 
       if (existingUser == null) {
         // User doesn't exist, create one
-        print('User not found in database, creating new record...');
         final authUser = _supabase.auth.currentUser;
         await _supabase.from('users').insert({
           'auth_id': userId,
@@ -88,10 +84,9 @@ class StorageService {
           'role': 'patient',
           'profile_picture_url': profilePictureUrl,
         });
-        print('User record created successfully');
       } else {
         // User exists, update it
-        final response = await _supabase
+        await _supabase
             .from('users')
             .update({
               'profile_picture_url': profilePictureUrl,
@@ -99,11 +94,8 @@ class StorageService {
             })
             .eq('auth_id', userId)
             .select();
-
-        print('Update response: $response');
       }
     } catch (e) {
-      print('Error updating profile picture: $e');
       throw Exception('Failed to update profile picture in database: $e');
     }
   }
@@ -135,8 +127,7 @@ class StorageService {
         try {
           await deleteProfileImage(oldImageUrl);
         } catch (e) {
-          // Continue even if delete fails
-          print('Warning: Failed to delete old image: $e');
+          rethrow;
         }
       }
 
