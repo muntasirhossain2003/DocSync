@@ -203,28 +203,45 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
 
               // Login button
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 56,
                 child: ElevatedButton(
                   onPressed: loading ? null : login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.dark_blue,
+                    backgroundColor: const Color(
+                      0xFF1E3A8A,
+                    ), // Darker, richer blue
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shadowColor: Colors.black.withOpacity(0.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    disabledBackgroundColor: const Color(
+                      0xFF1E3A8A,
+                    ).withOpacity(0.5),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: loading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
                       : const Text(
                           'Login',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
                             color: Colors.white,
+                            letterSpacing: 0.8,
                           ),
                         ),
                 ),
