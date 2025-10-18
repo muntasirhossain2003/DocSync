@@ -191,8 +191,20 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
       );
 
       if (result.success) {
-        // NOTE: Skipping payment recording as payments table doesn't exist
-        // Payment record would be created here if payments table is available
+        // Calculate discount information
+        final originalFee = consultation.fee;
+        final discountAmount = originalFee - finalAmount;
+
+        // Record payment in consultation_payments table
+        await _service.recordPayment(
+          consultationId: consultation.id,
+          userId: userId,
+          paymentType: paymentType,
+          transactionId: result.transactionId ?? 'N/A',
+          amount: finalAmount,
+          originalAmount: originalFee,
+          discountApplied: discountAmount,
+        );
 
         // Mark consultation as paid
         await _repository.markAsPaid(

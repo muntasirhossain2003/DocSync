@@ -317,10 +317,11 @@ class DoctorCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Icons.attach_money,
+                  Icons.payments_outlined,
                   size: 18,
                   color: Colors.indigo.shade700,
                 ),
+                const SizedBox(width: 4),
                 Text(
                   '৳${doctor.consultationFee.toStringAsFixed(0)}',
                   style: TextStyle(
