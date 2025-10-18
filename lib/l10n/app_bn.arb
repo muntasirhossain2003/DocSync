@@ -1,0 +1,77 @@
+{
+  "@@locale": "bn",
+  
+  "appTitle": "ডকসিঙ্ক",
+  
+  "home": "হোম",
+  "consult": "পরামর্শ",
+  "ai": "এআই",
+  "health": "স্বাস্থ্য",
+  "profile": "প্রোফাইল",
+
+  "hi": "হ্যালো",
+  "howIsYourHealth": "আপনার স্বাস্থ্য কেমন?",
+  
+  "upcomingSchedule": "আসন্ন সময়সূচী",
+  "seeAll": "সব দেখুন",
+  "noUpcomingSchedule": "কোন আসন্ন সময়সূচী নেই",
+  "availableIn": "{time} এ উপলব্ধ",
+  
+  "categories": "বিভাগসমূহ",
+  "allCategories": "সকল বিভাগ",
+  
+  "topDoctors": "শীর্ষ চিকিৎসক",
+  "allDoctors": "সকল চিকিৎসক",
+  "noDoctorsAvailable": "কোন চিকিৎসক উপলব্ধ নেই",
+  "checkBackLater": "পরে আবার দেখুন।",
+  "errorLoadingDoctors": "চিকিৎসক লোড করতে ত্রুটি",
+  "retry": "আবার চেষ্টা করুন",
+  "available": "উপলব্ধ",
+  "offline": "অফলাইন",
+  
+  "neurologist": "নিউরোলজিস্ট",
+  "neuromedicine": "নিউরোমেডিসিন",
+  "neurosurgeon": "নিউরোসার্জন",
+  "nutritionist": "পুষ্টিবিদ",
+  "oncologist": "অনকোলজিস্ট",
+  "ophthalmologist": "চক্ষু বিশেষজ্ঞ",
+  
+  "settings": "সেটিংস",
+  "theme": "থিম",
+  "notifications": "বিজ্ঞপ্তি",
+  "light": "হালকা",
+  "dark": "অন্ধকার",
+  "system": "সিস্টেম",
+  "selectTheme": "থিম নির্বাচন করুন",
+  
+  "language": "ভাষা",
+  "selectLanguage": "ভাষা নির্বাচন করুন",
+  "english": "English",
+  "bangla": "বাংলা",
+  "languageChangedToEnglish": "ভাষা বাংলায় পরিবর্তন করা হয়েছে",
+  
+  "subscriptionsAndCarePlans": "সাবস্ক্রিপশন এবং যত্ন পরিকল্পনা",
+  "privacyPolicy": "গোপনীয়তা নীতি",
+  "termsOfService": "সেবার শর্তাবলী",
+  "helpAndSupport": "সাহায্য এবং সহায়তা",
+  
+  "signOut": "সাইন আউট",
+  "cancel": "বাতিল",
+  
+  "profilePictureUpdated": "প্রোফাইল ছবি আপডেট হয়েছে!",
+  
+  "findDoctor": "চিকিৎসক খুঁজুন",
+  "searchDoctorByName": "নাম দিয়ে চিকিৎসক খুঁজুন...",
+  "noResultsFound": "কোন ফলাফল পাওয়া যায়নি",
+  "trySearchingWithDifferentKeywords": "ভিন্ন কীওয়ার্ড দিয়ে খোঁজার চেষ্টা করুন",
+  
+  "bookAppointment": "অ্যাপয়েন্টমেন্ট বুক করুন",
+  "selectDate": "তারিখ নির্বাচন করুন",
+  "selectTime": "সময় নির্বাচন করুন",
+  "confirmBooking": "বুকিং নিশ্চিত করুন",
+  "bookingConfirmed": "বুকিং নিশ্চিত হয়েছে!",
+  
+  "chatWithAI": "এআই এর সাথে চ্যাট করুন",
+  "typeYourMessage": "আপনার বার্তা টাইপ করুন...",
+  "send": "পাঠান"
+}

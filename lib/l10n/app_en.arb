@@ -1,0 +1,80 @@
+{
+  "@@locale": "en",
+  
+  "appTitle": "DocSync",
+  "@appTitle": {
+    "description": "Application title"
+  },
+
+  "home": "Home",
+  "consult": "Consult",
+  "ai": "AI",
+  "health": "Health",
+  "profile": "Profile",
+
+  "hi": "Hi",
+  "howIsYourHealth": "How is your health?",
+  
+  "upcomingSchedule": "Upcoming Schedule",
+  "seeAll": "See All",
+  "noUpcomingSchedule": "No upcoming schedule",
+  "availableIn": "Available in {time}",
+  
+  "categories": "Categories",
+  "allCategories": "All Categories",
+  
+  "topDoctors": "Top Doctors",
+  "allDoctors": "All Doctors",
+  "noDoctorsAvailable": "No Doctors Available",
+  "checkBackLater": "Check back later.",
+  "errorLoadingDoctors": "Error Loading Doctors",
+  "retry": "Retry",
+  "available": "Available",
+  "offline": "Offline",
+  
+  "neurologist": "Neurologist",
+  "neuromedicine": "Neuromedicine",
+  "neurosurgeon": "Neurosurgeon",
+  "nutritionist": "Nutritionist",
+  "oncologist": "Oncologist",
+  "ophthalmologist": "Ophthalmologist",
+  
+  "settings": "Settings",
+  "theme": "Theme",
+  "notifications": "Notifications",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System",
+  "selectTheme": "Select Theme",
+  
+  "language": "Language",
+  "selectLanguage": "Select Language",
+  "english": "English",
+  "bangla": "বাংলা (Bangla)",
+  "languageChangedToEnglish": "Language changed to English",
+  
+  "subscriptionsAndCarePlans": "Subscriptions & Care Plans",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "helpAndSupport": "Help & Support",
+  
+  "signOut": "Sign out",
+  "cancel": "Cancel",
+  
+  "profilePictureUpdated": "Profile picture updated!",
+  
+  "findDoctor": "Find Doctor",
+  "searchDoctorByName": "Search doctor by name...",
+  "noResultsFound": "No results found",
+  "trySearchingWithDifferentKeywords": "Try searching with different keywords",
+  
+  "bookAppointment": "Book Appointment",
+  "selectDate": "Select Date",
+  "selectTime": "Select Time",
+  "confirmBooking": "Confirm Booking",
+  "bookingConfirmed": "Booking Confirmed!",
+  
+  "chatWithAI": "Chat with AI",
+  "typeYourMessage": "Type your message...",
+  "send": "Send"
+}

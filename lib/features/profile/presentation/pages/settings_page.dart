@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/theme_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -9,16 +10,17 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Appearance',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              l10n.theme,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
           ListTile(
@@ -29,13 +31,13 @@ class SettingsPage extends ConsumerWidget {
                   ? Icons.light_mode
                   : Icons.brightness_auto,
             ),
-            title: const Text('Theme'),
+            title: Text(l10n.theme),
             subtitle: Text(
               themeMode == ThemeMode.dark
-                  ? 'Dark'
+                  ? l10n.dark
                   : themeMode == ThemeMode.light
-                  ? 'Light'
-                  : 'System',
+                  ? l10n.light
+                  : l10n.system,
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -43,16 +45,16 @@ class SettingsPage extends ConsumerWidget {
             },
           ),
           const Divider(),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Other Settings',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              l10n.notifications,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
-            title: const Text('Notifications'),
+            title: Text(l10n.notifications),
             trailing: Switch(
               value: true,
               onChanged: (value) {
@@ -75,15 +77,17 @@ class SettingsPage extends ConsumerWidget {
     WidgetRef ref,
     ThemeMode currentMode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Choose Theme'),
+        title: Text(l10n.selectTheme),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<ThemeMode>(
-              title: const Text('Light'),
+              title: Text(l10n.light),
               value: ThemeMode.light,
               groupValue: currentMode,
               onChanged: (value) {
@@ -94,7 +98,7 @@ class SettingsPage extends ConsumerWidget {
               },
             ),
             RadioListTile<ThemeMode>(
-              title: const Text('Dark'),
+              title: Text(l10n.dark),
               value: ThemeMode.dark,
               groupValue: currentMode,
               onChanged: (value) {
@@ -105,7 +109,7 @@ class SettingsPage extends ConsumerWidget {
               },
             ),
             RadioListTile<ThemeMode>(
-              title: const Text('System'),
+              title: Text(l10n.system),
               value: ThemeMode.system,
               groupValue: currentMode,
               onChanged: (value) {

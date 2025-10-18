@@ -2,6 +2,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class PatientShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
   const PatientShell({super.key, required this.navigationShell});
@@ -39,7 +41,7 @@ class PatientShell extends StatelessWidget {
               FluentIcons.home_24_filled,
               color: colorScheme.primary,
             ),
-            label: 'Home',
+            label: AppLocalizations.of(context)!.home,
           ),
           NavigationDestination(
             icon: Icon(
@@ -50,7 +52,7 @@ class PatientShell extends StatelessWidget {
               FluentIcons.stethoscope_24_filled,
               color: colorScheme.primary,
             ),
-            label: 'Consult',
+            label: AppLocalizations.of(context)!.consult,
           ),
           NavigationDestination(
             icon: Icon(
@@ -61,7 +63,7 @@ class PatientShell extends StatelessWidget {
               FluentIcons.brain_circuit_24_filled,
               color: colorScheme.primary,
             ),
-            label: 'AI',
+            label: AppLocalizations.of(context)!.ai,
           ),
           NavigationDestination(
             icon: Icon(
@@ -72,7 +74,7 @@ class PatientShell extends StatelessWidget {
               FluentIcons.heart_pulse_24_filled,
               color: colorScheme.primary,
             ),
-            label: 'Health',
+            label: AppLocalizations.of(context)!.health,
           ),
           NavigationDestination(
             icon: Icon(
@@ -83,7 +85,7 @@ class PatientShell extends StatelessWidget {
               FluentIcons.person_24_filled,
               color: colorScheme.primary,
             ),
-            label: 'Profile',
+            label: AppLocalizations.of(context)!.profile,
           ),
         ],
       ),
