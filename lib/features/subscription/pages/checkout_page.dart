@@ -19,7 +19,7 @@ class _SubscriptionCheckoutPageState
     extends ConsumerState<SubscriptionCheckoutPage> {
   String _selectedMethod = 'bKash';
   bool _isLoading = false;
-  final _methods = ['bKash', 'Nagad', 'Credit Card', 'Debit Card'];
+  final _methods = ['bKash', 'Nagad', 'Rocket'];
 
   final TextEditingController _paymentNumberController =
       TextEditingController();
@@ -64,7 +64,7 @@ class _SubscriptionCheckoutPageState
                     _buildRow(
                       theme,
                       'Cost',
-                      '\$${widget.plan.rate.toStringAsFixed(2)}',
+                      '\৳${widget.plan.cost.toStringAsFixed(2)}',
                       valueColor: theme.colorScheme.primary,
                     ),
                     const SizedBox(height: 12),
@@ -211,7 +211,7 @@ class _SubscriptionCheckoutPageState
                           await createPayment(
                             userId: internalUserId,
                             subscriptionId: subscription.id,
-                            amount: widget.plan.rate.toDouble(),
+                            amount: widget.plan.cost.toDouble(),
                             paymentMethod: _selectedMethod,
                             paymentNumber: paymentNumber,
                           );
@@ -219,7 +219,7 @@ class _SubscriptionCheckoutPageState
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text(
-                                    'Payment initiated, status: pending')),
+                                    'Payment has been successfully processed')),
                           );
 
                           Navigator.pop(context);

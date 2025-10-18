@@ -33,3 +33,11 @@ final subscriptionPlansProvider =
   final getPlans = ref.watch(getSubscriptionPlansProvider);
   return getPlans();
 });
+
+// FutureProvider to fetch a single subscription plan by ID
+final subscriptionPlanByIdProvider =
+    FutureProvider.family<SubscriptionPlan?, String>((ref, planId) async {
+  if (planId.isEmpty) return null;
+  final dataSource = ref.watch(subscriptionPlanRemoteDataSourceProvider);
+  return dataSource.fetchPlanById(planId);
+});

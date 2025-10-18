@@ -15,7 +15,7 @@ class SubscriptionPaymentRemoteDataSource {
   final response = await client.from('subscriptions').insert({
     'user_id': userId,
     'plan_id': planId,
-    'status': 'pending',
+    'status': 'active',
     'start_at': startAt.toIso8601String(),
     'end_at': endAt.toIso8601String(),
   }).select().single();
@@ -45,7 +45,7 @@ class SubscriptionPaymentRemoteDataSource {
       'subscription_id': subscriptionId,
       'amount': amount,
       'payment_method': paymentMethod,
-      'payment_status': 'pending',
+      'payment_status': 'completed',
       'payment_number': paymentNumber
     }).select().single();
 

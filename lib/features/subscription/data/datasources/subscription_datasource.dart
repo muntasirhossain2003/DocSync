@@ -14,14 +14,19 @@ class SubscriptionDatasource {
 
     if(response == null) return null;
 
+    // Add null checks and safe casting
     return Subscription(
-      id: response['id'],
-      userId: response['userId'],
-      status: response['status'],
-      startAt: response['start_at'],
-      endAt: response['end_at'],
-      autoRenew: response['auto_renew'],
-      planId: response['plan_id']
+      id: response['id'] as String,
+      userId: response['user_id'] as String? ?? userId, // Fallback to parameter
+      status: response['status'] as String? ?? 'pending',
+      startAt: response['start_at'] != null 
+          ? DateTime.parse(response['start_at'] as String)
+          : DateTime.now(),
+      endAt: response['end_at'] != null
+          ? DateTime.parse(response['end_at'] as String)
+          : DateTime.now(),
+      autoRenew: response['auto_renew'] as bool? ?? false,
+      planId: response['plan_id'] as String? ?? '',
     );
   }
 }

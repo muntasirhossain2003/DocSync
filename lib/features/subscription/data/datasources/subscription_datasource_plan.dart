@@ -7,7 +7,8 @@ class SubscriptionPlanRemoteDataSource {
   SubscriptionPlanRemoteDataSource(this.client);
 
   Future<List<SubscriptionPlan>> fetchPlans() async {
-    final response = await client.from('subscription_plans').select();    // Supabase returns List<dynamic> directly now
+    final response = await client.from('subscription_plans').select();
+    // Supabase returns List<dynamic> directly now
     final data = response;
     return data
         .map((e) => SubscriptionPlan(
@@ -18,6 +19,23 @@ class SubscriptionPlanRemoteDataSource {
               duration: e['duration'] as int? ?? 365,
             ))
         .toList();
-  // ignore: dead_code
-    }
+  }
+
+  Future<SubscriptionPlan?> fetchPlanById(String planId) async {
+    final response = await client
+        .from('subscription_plans')
+        .select()
+        .eq('id', planId)
+        .maybeSingle();
+
+    if (response == null) return null;
+
+    return SubscriptionPlan(
+      id: response['id'] as String,
+      name: response['name'] as String? ?? '',
+      rate: response['rate'] as int? ?? 0,
+      cost: response['cost'] as int? ?? 0,
+      duration: response['duration'] as int? ?? 365,
+    );
+  }
 }
