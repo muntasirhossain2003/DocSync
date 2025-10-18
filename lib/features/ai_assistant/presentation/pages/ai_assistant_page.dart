@@ -1,11 +1,13 @@
 // lib/features/ai_assistant/presentation/pages/ai_assistant_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../home/presentation/pages/doctors_by_specialty_page.dart';
 import '../../../home/presentation/widgets/home_widgets.dart';
 import '../providers/ai_chat_provider.dart';
 import '../widgets/chat_input_field.dart';
 import '../widgets/chat_message_bubble.dart';
+import '../widgets/specialist_recommendation_card.dart';
 
 class AIAssistantPage extends ConsumerStatefulWidget {
   const AIAssistantPage({super.key});
@@ -63,15 +65,16 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
 
         final matchingCategory = categories.firstWhere(
           (cat) => cat.specialization.toLowerCase().contains(
-                specialization.toLowerCase(),
-              ),
+            specialization.toLowerCase(),
+          ),
           orElse: () => categories.first,
         );
 
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DoctorsBySpecialtyPage(category: matchingCategory),
+            builder: (context) =>
+                DoctorsBySpecialtyPage(category: matchingCategory),
           ),
         );
       },
@@ -134,9 +137,7 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
                         ref.read(chatProvider.notifier).clearChat();
                         Navigator.pop(context);
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.red,
-                      ),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
                       child: const Text('Clear'),
                     ),
                   ],
@@ -148,57 +149,13 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
       ),
       body: Column(
         children: [
-          // Recommended Specialist Chip
+          // Recommended Specialist Card
           if (chatState.recommendedSpecialization != null)
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: Material(
-                elevation: 2,
-                borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.primary,
-                child: InkWell(
-                  onTap: () => _navigateToSpecialist(
-                    chatState.recommendedSpecialization!,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.local_hospital, color: Colors.white),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Recommended Specialist',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                chatState.recommendedSpecialization!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            SpecialistRecommendationCard(
+              specialization: chatState.recommendedSpecialization!,
+              reasoning: chatState.reasoning,
+              onTap: () =>
+                  _navigateToSpecialist(chatState.recommendedSpecialization!),
             ),
 
           // Messages List
@@ -256,10 +213,7 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
                   const SizedBox(width: 12),
                   const Text(
                     'Analyzing your symptoms...',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
