@@ -20,6 +20,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool loading = false;
   bool sendingReset = false;
   bool isHovering = false;
+  bool obscure = true;
 
   @override
   void dispose() {
@@ -158,7 +159,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               // Password
               TextField(
                 controller: passwordController,
-                obscureText: true,
+                obscureText: obscure,
                 decoration: InputDecoration(
                   filled: true,
                   floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -168,6 +169,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscure ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        obscure = !obscure;
+                      });
+                    },
                   ),
                 ),
               ),
