@@ -570,9 +570,9 @@ class CategoriesSection extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                childAspectRatio: 1.1,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: displayCategories.length,
               itemBuilder: (context, index) {
@@ -642,23 +642,23 @@ class CategoryCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 45,
-          height: 45,
+          width: 55,
+          height: 55,
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: Center(child: Icon(icon, color: color, size: 22)),
+          child: Center(child: Icon(icon, color: color, size: 28)),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 6),
         Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: FontWeight.w500,
             color: colorScheme.onSurface,
-            height: 1.1,
+            height: 1.2,
           ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
