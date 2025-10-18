@@ -15,6 +15,8 @@ class ChatMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isUser = message.isUser;
     final bool isError = message.isError;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -26,14 +28,18 @@ class ChatMessageBubble extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isError
-              ? Colors.red.shade50
+              ? (isDark
+                    ? Colors.red.shade900.withOpacity(0.3)
+                    : Colors.red.shade50)
               : isUser
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey.shade100,
+              ? colorScheme.primary
+              : (isDark
+                    ? colorScheme.surfaceContainerHighest
+                    : Colors.grey.shade100),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -45,50 +51,58 @@ class ChatMessageBubble extends StatelessWidget {
             if (isUser)
               Text(
                 message.text,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: colorScheme.onPrimary, fontSize: 16),
               )
             else
               MarkdownBody(
                 data: message.text,
                 styleSheet: MarkdownStyleSheet(
                   p: TextStyle(
-                    color: isError ? Colors.red.shade900 : Colors.black87,
+                    color: isError
+                        ? (isDark ? Colors.red.shade200 : Colors.red.shade900)
+                        : colorScheme.onSurface,
                     fontSize: 15,
                     height: 1.5,
                   ),
                   h2: TextStyle(
-                    color: isError ? Colors.red.shade900 : Colors.black,
+                    color: isError
+                        ? (isDark ? Colors.red.shade200 : Colors.red.shade900)
+                        : colorScheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                   h3: TextStyle(
-                    color: isError ? Colors.red.shade900 : Colors.black87,
+                    color: isError
+                        ? (isDark ? Colors.red.shade200 : Colors.red.shade900)
+                        : colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                   listBullet: TextStyle(
-                    color: isError ? Colors.red.shade900 : Colors.black87,
+                    color: isError
+                        ? (isDark ? Colors.red.shade200 : Colors.red.shade900)
+                        : colorScheme.onSurface,
                   ),
                   strong: TextStyle(
                     color: isError
-                        ? Colors.red.shade900
-                        : Theme.of(context).colorScheme.primary,
+                        ? (isDark ? Colors.red.shade200 : Colors.red.shade900)
+                        : colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
-                  em: const TextStyle(
-                    fontStyle: FontStyle.italic,
-                  ),
+                  em: const TextStyle(fontStyle: FontStyle.italic),
                   code: TextStyle(
                     backgroundColor: isError
-                        ? Colors.red.shade100
-                        : Colors.grey.shade200,
+                        ? (isDark
+                              ? Colors.red.shade900.withOpacity(0.3)
+                              : Colors.red.shade100)
+                        : (isDark
+                              ? colorScheme.surfaceContainer
+                              : Colors.grey.shade200),
                     fontFamily: 'monospace',
+                    color: colorScheme.onSurface,
                   ),
                   blockquote: TextStyle(
-                    color: Colors.grey.shade700,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -99,16 +113,18 @@ class ChatMessageBubble extends StatelessWidget {
               children: [
                 if (message.recommendedSpecialization != null) ...[
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       message.recommendedSpecialization!,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: colorScheme.primary,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
@@ -120,8 +136,8 @@ class ChatMessageBubble extends StatelessWidget {
                   DateFormat('h:mm a').format(message.timestamp),
                   style: TextStyle(
                     color: isUser
-                        ? Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)
-                        : Colors.grey.shade600,
+                        ? colorScheme.onPrimary.withOpacity(0.7)
+                        : colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 11,
                   ),
                 ),

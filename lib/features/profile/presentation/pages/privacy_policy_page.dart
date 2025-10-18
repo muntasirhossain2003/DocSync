@@ -5,6 +5,8 @@ class PrivacyPolicyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Privacy Policy')),
       body: SingleChildScrollView(
@@ -19,7 +21,10 @@ class PrivacyPolicyPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Last updated: October 18, 2025',
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              style: TextStyle(
+                color: colorScheme.onSurface.withOpacity(0.6),
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 24),
             _buildSection(

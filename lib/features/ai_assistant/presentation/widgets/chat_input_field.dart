@@ -16,13 +16,16 @@ class ChatInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -34,7 +37,9 @@ class ChatInputField extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: isDark
+                      ? colorScheme.surfaceContainerHighest
+                      : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
@@ -42,9 +47,12 @@ class ChatInputField extends StatelessWidget {
                   enabled: enabled,
                   maxLines: null,
                   textCapitalization: TextCapitalization.sentences,
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: 'Describe your symptoms...',
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                    hintStyle: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.5),
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -58,8 +66,8 @@ class ChatInputField extends StatelessWidget {
             const SizedBox(width: 8),
             Material(
               color: enabled
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey.shade300,
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withOpacity(0.3),
               borderRadius: BorderRadius.circular(24),
               child: InkWell(
                 onTap: enabled ? onSend : null,
@@ -68,7 +76,9 @@ class ChatInputField extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: Icon(
                     Icons.send,
-                    color: enabled ? Colors.white : Colors.grey.shade500,
+                    color: enabled
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface.withOpacity(0.5),
                     size: 24,
                   ),
                 ),
