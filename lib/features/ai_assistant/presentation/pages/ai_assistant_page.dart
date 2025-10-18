@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+
 import '../../../home/presentation/pages/doctors_by_specialty_page.dart';
 import '../../../home/presentation/widgets/home_widgets.dart';
 
@@ -39,7 +40,7 @@ class _AIAssistantPageState extends ConsumerState<AIAssistantPage> {
       return;
     }
 
-    _model = GenerativeModel(model:'gemini-2.5-flash', apiKey: apiKey);
+    _model = GenerativeModel(model: 'gemini-2.5-flash', apiKey: apiKey);
   }
 
   void _addWelcomeMessage() {
@@ -140,24 +141,58 @@ Keep response concise, professional.
     }
   }
 
-  void _navigateToSpecialist() {
+  void _navigateToSpecialist() async {
     if (_recommendedSpecialization == null) return;
 
     // Find matching category
-    final categories = ref.read(categoriesProvider);
-    final matchingCategory = categories.firstWhere(
-      (cat) => cat.specialization.toLowerCase().contains(
-        _recommendedSpecialization!.toLowerCase(),
-      ),
-      orElse: () => categories.first,
-    );
+    final categoriesAsync = ref.read(categoriesProvider);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            DoctorsBySpecialtyPage(category: matchingCategory),
-      ),
+    categoriesAsync.when(
+      data: (categories) {
+        if (categories.isEmpty) {
+          // Show error if no categories available
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No categories available at the moment'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        final matchingCategory = categories.firstWhere(
+          (cat) => cat.specialization.toLowerCase().contains(
+            _recommendedSpecialization!.toLowerCase(),
+          ),
+          orElse: () => categories.first,
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                DoctorsBySpecialtyPage(category: matchingCategory),
+          ),
+        );
+      },
+      loading: () {
+        // Show loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Loading categories...'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+      error: (error, stack) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading categories: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      },
     );
   }
 

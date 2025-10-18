@@ -1,5 +1,4 @@
 // lib/features/booking/presentation/widgets/consultation_type_selector.dart
-
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,32 +30,32 @@ class ConsultationTypeSelector extends ConsumerWidget {
             textTheme: textTheme,
           ),
         ),
-        SizedBox(width: AppConstants.spacingSM),
-        Expanded(
-          child: _buildTypeCard(
-            context,
-            ref,
-            type: ConsultationType.audio,
-            icon: FluentIcons.call_24_filled,
-            label: 'Audio',
-            isSelected: selectedType == ConsultationType.audio,
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-          ),
-        ),
-        SizedBox(width: AppConstants.spacingSM),
-        Expanded(
-          child: _buildTypeCard(
-            context,
-            ref,
-            type: ConsultationType.chat,
-            icon: FluentIcons.chat_24_filled,
-            label: 'Chat',
-            isSelected: selectedType == ConsultationType.chat,
-            colorScheme: colorScheme,
-            textTheme: textTheme,
-          ),
-        ),
+        const SizedBox(width: AppConstants.spacingSM),
+        // Expanded(
+        //   child: _buildTypeCard(
+        //     context,
+        //     ref,
+        //     type: ConsultationType.audio,
+        //     icon: FluentIcons.call_24_filled,
+        //     label: 'Audio',
+        //     isSelected: selectedType == ConsultationType.audio,
+        //     colorScheme: colorScheme,
+        //     textTheme: textTheme,
+        //   ),
+        // ),
+        // SizedBox(width: AppConstants.spacingSM),
+        // Expanded(
+        //   child: _buildTypeCard(
+        //     context,
+        //     ref,
+        //     type: ConsultationType.chat,
+        //     icon: FluentIcons.chat_24_filled,
+        //     label: 'Chat',
+        //     isSelected: selectedType == ConsultationType.chat,
+        //     colorScheme: colorScheme,
+        //     textTheme: textTheme,
+        //   ),
+        // ),
       ],
     );
   }

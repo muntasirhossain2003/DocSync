@@ -8,7 +8,6 @@ import '../../../../core/theme/app_constants.dart';
 import '../../../consult/domain/models/doctor.dart';
 import '../../domain/models/consultation.dart';
 import '../providers/booking_provider.dart';
-import '../widgets/consultation_type_selector.dart';
 import '../widgets/date_selector_widget.dart';
 import '../widgets/doctor_info_card.dart';
 import '../widgets/time_slot_widget.dart';
@@ -118,26 +117,19 @@ class _BookingPageState extends ConsumerState<BookingPage> {
       body: bookingState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding: EdgeInsets.all(AppConstants.spacingMD),
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Doctor Info Card
                   DoctorInfoCard(doctor: widget.doctor),
 
-                  SizedBox(height: AppConstants.spacingLG),
+                  const SizedBox(height: AppConstants.spacingLG),
 
-                  // Consultation Type Selector
-                  Text(
-                    'Consultation Type',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: AppConstants.spacingSM),
-                  const ConsultationTypeSelector(),
+                  // Consultation Type - Video Only (no selector needed)
+                  // Automatically defaults to video consultation
 
-                  SizedBox(height: AppConstants.spacingLG),
+                  // const SizedBox(height: AppConstants.spacingLG),
 
                   // Date Selector
                   Text(
@@ -146,10 +138,10 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: AppConstants.spacingSM),
+                  const SizedBox(height: AppConstants.spacingSM),
                   const DateSelectorWidget(),
 
-                  SizedBox(height: AppConstants.spacingLG),
+                  const SizedBox(height: AppConstants.spacingLG),
 
                   // Time Slots
                   Text(
@@ -158,10 +150,10 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: AppConstants.spacingSM),
+                  const SizedBox(height: AppConstants.spacingSM),
                   const TimeSlotsWidget(),
 
-                  SizedBox(height: AppConstants.spacingLG),
+                  const SizedBox(height: AppConstants.spacingLG),
 
                   // Notes (Optional)
                   Text(
@@ -170,7 +162,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: AppConstants.spacingSM),
+                  const SizedBox(height: AppConstants.spacingSM),
                   TextField(
                     controller: _notesController,
                     maxLines: 3,
@@ -186,12 +178,12 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                     ),
                   ),
 
-                  SizedBox(height: AppConstants.spacingXL),
+                  const SizedBox(height: AppConstants.spacingXL),
 
                   // Summary Card
                   if (selectedSlot != null) ...[
                     Container(
-                      padding: EdgeInsets.all(AppConstants.spacingMD),
+                      padding: const EdgeInsets.all(AppConstants.spacingMD),
                       decoration: BoxDecoration(
                         color: colorScheme.primaryContainer.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(
@@ -211,7 +203,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                               color: colorScheme.primary,
                             ),
                           ),
-                          SizedBox(height: AppConstants.spacingSM),
+                          const SizedBox(height: AppConstants.spacingSM),
                           _buildSummaryRow(
                             'Date',
                             selectedSlot.formattedDate,
@@ -233,7 +225,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: AppConstants.spacingLG),
+                    const SizedBox(height: AppConstants.spacingLG),
                   ],
 
                   // Proceed Button
@@ -242,7 +234,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                         ? _proceedToCheckout
                         : null,
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         vertical: AppConstants.spacingMD,
                       ),
                       backgroundColor: colorScheme.primary,
@@ -262,7 +254,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                     ),
                   ),
 
-                  SizedBox(height: AppConstants.spacingXL),
+                  const SizedBox(height: AppConstants.spacingXL),
                 ],
               ),
             ),
@@ -276,7 +268,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
     ColorScheme colorScheme,
   ) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppConstants.spacingXS),
+      padding: const EdgeInsets.only(bottom: AppConstants.spacingXS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

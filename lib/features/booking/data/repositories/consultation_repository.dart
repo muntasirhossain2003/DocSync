@@ -32,7 +32,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
@@ -71,7 +71,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
@@ -131,7 +131,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
@@ -149,7 +149,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .eq('id', consultationId)
           .single();
@@ -168,7 +168,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .eq('patient_id', patientId)
           .order('scheduled_time', ascending: false);
@@ -190,7 +190,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .eq('patient_id', patientId)
           .gte('scheduled_time', now)
@@ -220,7 +220,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
@@ -243,7 +243,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
@@ -266,7 +266,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
@@ -314,7 +314,7 @@ class ConsultationRepository {
           .select('''
             *,
             patient:patient_id(id, full_name, profile_picture_url),
-            doctor:doctor_id(id, user_id, users(full_name, profile_picture_url))
+            doctor:doctor_id(id, users!user_id(full_name, profile_picture_url))
           ''')
           .single();
 
