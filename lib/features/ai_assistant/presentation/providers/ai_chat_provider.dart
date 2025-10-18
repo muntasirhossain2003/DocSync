@@ -14,12 +14,14 @@ class ChatState {
   final bool isLoading;
   final String? error;
   final String? recommendedSpecialization;
+  final String? reasoning;
 
   const ChatState({
     this.messages = const [],
     this.isLoading = false,
     this.error,
     this.recommendedSpecialization,
+    this.reasoning,
   });
 
   ChatState copyWith({
@@ -27,6 +29,7 @@ class ChatState {
     bool? isLoading,
     String? error,
     String? recommendedSpecialization,
+    String? reasoning,
     bool clearError = false,
     bool clearSpecialization = false,
   }) {
@@ -37,6 +40,7 @@ class ChatState {
       recommendedSpecialization: clearSpecialization
           ? null
           : (recommendedSpecialization ?? this.recommendedSpecialization),
+      reasoning: clearSpecialization ? null : (reasoning ?? this.reasoning),
     );
   }
 }
@@ -104,6 +108,7 @@ Describe your symptoms in detail, and I'll help analyze them and recommend the a
         messages: [...state.messages, aiMessage],
         isLoading: false,
         recommendedSpecialization: analysis.recommendedSpecialization,
+        reasoning: analysis.reasoning,
       );
     } catch (e) {
       // Add error message
