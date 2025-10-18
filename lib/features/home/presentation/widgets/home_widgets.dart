@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/app_constants.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../video_call/domain/models/call_state.dart';
 import '../pages/all_categories_page.dart';
 import '../pages/all_top_doctors_page.dart';
@@ -51,17 +52,18 @@ class HomeHeader extends ConsumerWidget {
             children: [
               userAsync.when(
                 data: (user) => Text(
-                  'Hi, ${user?.firstName ?? 'User'}',
+                  '${AppLocalizations.of(context)!.hi}, ${user?.firstName ?? 'User'}',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 loading: () => const Text('Loading...'),
-                error: (_, __) => const Text('Hi, User'),
+                error: (_, __) =>
+                    Text('${AppLocalizations.of(context)!.hi}, User'),
               ),
               Text(
-                'How is your health?',
+                AppLocalizations.of(context)!.howIsYourHealth,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -97,16 +99,16 @@ class UpcomingScheduleSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Upcoming Schedule',
+              AppLocalizations.of(context)!.upcomingSchedule,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text(
-                'See All',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context)!.seeAll,
+                style: const TextStyle(
                   color: Color(0xFF4A90E2),
                   fontWeight: FontWeight.w500,
                 ),
@@ -135,7 +137,7 @@ class UpcomingScheduleSection extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'No upcoming appointments',
+                        AppLocalizations.of(context)!.noUpcomingSchedule,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -522,7 +524,7 @@ class CategoriesSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Categories',
+              AppLocalizations.of(context)!.categories,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -530,7 +532,7 @@ class CategoriesSection extends ConsumerWidget {
             TextButton(
               onPressed: () => _showAllCategories(context),
               child: Text(
-                'See All',
+                AppLocalizations.of(context)!.seeAll,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
@@ -677,7 +679,7 @@ class TopDoctorsSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Top Doctors',
+              AppLocalizations.of(context)!.topDoctors,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -692,7 +694,7 @@ class TopDoctorsSection extends StatelessWidget {
                 );
               },
               child: Text(
-                'See All',
+                AppLocalizations.of(context)!.seeAll,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
