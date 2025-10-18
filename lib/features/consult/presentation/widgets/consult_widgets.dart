@@ -322,20 +322,18 @@ class DoctorCard extends StatelessWidget {
                   color: Colors.indigo.shade700,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  '৳${doctor.consultationFee.toStringAsFixed(0)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo.shade700,
+                Flexible(
+                  child: Text(
+                    '৳${doctor.consultationFee.toStringAsFixed(0)} /consultation',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo.shade700,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  '/consultation',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                const Spacer(),
+                const SizedBox(width: 8),
 
                 // Action Buttons
                 OutlinedButton.icon(
@@ -344,22 +342,22 @@ class DoctorCard extends StatelessWidget {
                   label: const Text('Book'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: 10,
+                      vertical: 6,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 ElevatedButton.icon(
                   onPressed: doctor.isAvailableNow
                       ? () => _instantCall(context, doctor)
                       : null,
-                  icon: const Icon(Icons.video_call, size: 18),
-                  label: const Text('Call Now'),
+                  icon: const Icon(Icons.video_call, size: 16),
+                  label: const Text('Call'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: 10,
+                      vertical: 6,
                     ),
                   ),
                 ),
