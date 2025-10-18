@@ -68,8 +68,10 @@ class _BookingPageState extends ConsumerState<BookingPage> {
 
     ref.read(consultationNotesProvider.notifier).state = notes;
 
-    // Create the consultation
-    _createBooking(selectedSlot.dateTime, consultationType, notes);
+    // Create the consultation using the canonical UTC instant of the slot
+    final utcInstant =
+        selectedSlot.utcDateTime ?? selectedSlot.dateTime.toUtc();
+    _createBooking(utcInstant, consultationType, notes);
   }
 
   Future<void> _createBooking(

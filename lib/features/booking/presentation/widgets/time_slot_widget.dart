@@ -15,7 +15,7 @@ class TimeSlotsWidget extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final slotsAsync = ref.watch(availableSlotsProvider);
     final selectedSlot = ref.watch(selectedTimeSlotProvider);
-
+    
     return slotsAsync.when(
       data: (slots) {
         if (slots.isEmpty) {
