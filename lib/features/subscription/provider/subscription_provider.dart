@@ -28,6 +28,17 @@ final userSubscriptionProvider =
     final user = Supabase.instance.client.auth.currentUser;
     if(user == null) return null;
 
+    // Get internal user ID from users table using auth_id
+    final userRow = await Supabase.instance.client
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .maybeSingle();
+    
+    if (userRow == null) return null;
+    
+    final internalUserId = userRow['id'];
+
     final getUserSubscription = ref.watch(getSubscriptionUserProvider);
-    return getUserSubscription(user.id);
+    return getUserSubscription(internalUserId);
   });
