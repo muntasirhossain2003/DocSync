@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/theme.dart';
+import '../../../../core/theme/app_constants.dart';
 import '../../../video_call/domain/models/call_state.dart';
 import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
@@ -47,10 +47,9 @@ class HomeHeader extends ConsumerWidget {
               userAsync.when(
                 data: (user) => Text(
                   'Hi, ${user?.firstName ?? 'User'}',
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 loading: () => const Text('Loading...'),
@@ -58,7 +57,9 @@ class HomeHeader extends ConsumerWidget {
               ),
               Text(
                 'How is your health?',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -90,13 +91,11 @@ class UpcomingScheduleSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Upcoming Schedule',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () {},
@@ -117,8 +116,8 @@ class UpcomingScheduleSection extends ConsumerWidget {
               return Container(
                 height: 180,
                 decoration: BoxDecoration(
-                  color: AppColors.light_blue,
-                  borderRadius: BorderRadius.circular(16),
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(AppConstants.radiusLG),
                 ),
                 child: Center(
                   child: Column(
@@ -830,20 +829,18 @@ class CategoriesSection extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Categories',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () => _showAllCategories(context, categories),
-              child: const Text(
+              child: Text(
                 'See All',
-                style: TextStyle(
-                  color: Color(0xFF4A90E2),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -934,20 +931,18 @@ class TopDoctorsSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Top Doctors',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text(
+              child: Text(
                 'See All',
-                style: TextStyle(
-                  color: Color(0xFF4A90E2),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),

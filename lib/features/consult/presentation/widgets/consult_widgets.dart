@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../../core/theme/theme.dart';
 import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../../video_call/domain/models/call_state.dart';
@@ -370,14 +371,8 @@ class DoctorCard extends StatelessWidget {
   }
 
   void _bookConsultation(BuildContext context, Doctor doctor) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => BookConsultationSheet(doctor: doctor),
-    );
+    // Navigate to booking page
+    context.push('/booking', extra: doctor);
   }
 
   void _instantCall(BuildContext context, Doctor doctor) {
@@ -525,36 +520,12 @@ class _BookConsultationSheetState extends ConsumerState<BookConsultationSheet> {
             ],
           ),
           const Divider(height: 32),
-
-          // Consultation Type
-          const Text(
-            'Consultation Type',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
           const SizedBox(height: 8),
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(
-                value: 'video',
-                label: Text('Video'),
-                icon: Icon(Icons.videocam),
-              ),
-              ButtonSegment(
-                value: 'audio',
-                label: Text('Audio'),
-                icon: Icon(Icons.call),
-              ),
-              ButtonSegment(
-                value: 'chat',
-                label: Text('Chat'),
-                icon: Icon(Icons.chat),
-              ),
-            ],
-            selected: {consultationType},
-            onSelectionChanged: (Set<String> selection) {
-              setState(() => consultationType = selection.first);
-            },
+          const Text(
+            'Consultation Type: Video Consultation',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
+
           const SizedBox(height: 20),
 
           // Date Selection

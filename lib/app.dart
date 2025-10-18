@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/routing/router.dart';
-
+import './core/theme/app_theme.dart';
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -34,7 +34,8 @@ class MyApp extends ConsumerWidget {
 
         return MaterialApp.router(
           title: 'DocSync',
-          theme: ThemeData(primarySwatch: Colors.indigo),
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
           routerConfig: router,
         );
       },
