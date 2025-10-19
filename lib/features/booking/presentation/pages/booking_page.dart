@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_constants.dart';
 import '../../../consult/domain/models/doctor.dart';
+import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../domain/models/consultation.dart';
 import '../providers/booking_provider.dart';
 import '../widgets/date_selector_widget.dart';
@@ -89,6 +90,8 @@ class _BookingPageState extends ConsumerState<BookingPage> {
         );
 
     if (consultation != null && mounted) {
+      // Immediately refresh upcoming consultations so Home reflects the new booking
+      ref.invalidate(upcomingConsultationsProvider);
       // Navigate to checkout page
       context.push('/booking/checkout', extra: consultation);
     } else if (mounted) {

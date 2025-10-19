@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_constants.dart';
+import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../domain/models/consultation.dart';
 import '../../domain/models/payment_method.dart';
 import '../providers/booking_provider.dart';
@@ -95,6 +96,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             onPressed: () {
               // Close dialog and navigate to home
               Navigator.of(context).pop();
+              // Ensure upcoming schedule is refreshed on Home
+              ref.invalidate(upcomingConsultationsProvider);
               context.go('/home');
             },
             child: const Text('Done'),
