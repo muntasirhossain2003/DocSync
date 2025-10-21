@@ -2,7 +2,6 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../data/repositories/ai_chat_repository_impl.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/repositories/ai_chat_repository.dart';
