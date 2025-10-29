@@ -152,8 +152,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                 
                 ),
+                //  style: const TextStyle(color: Color.fromARGB(255, 13, 13, 13)),
               ),
+              
               const SizedBox(height: 16),
 
               // Password

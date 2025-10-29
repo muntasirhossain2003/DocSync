@@ -164,14 +164,20 @@ class DoctorList extends ConsumerWidget {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: doctors.length,
-            separatorBuilder: (_, __) => const Divider(height: 24),
-            itemBuilder: (context, index) {
-              final doctor = doctors[index];
-              return DoctorCard(doctor: doctor);
+          return RefreshIndicator(
+            onRefresh: () async {
+              final future = ref.refresh(filteredDoctorsProvider.future);
+              await future;
             },
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: doctors.length,
+              separatorBuilder: (_, __) => const Divider(height: 24),
+              itemBuilder: (context, index) {
+                final doctor = doctors[index];
+                return DoctorCard(doctor: doctor);
+              },
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),

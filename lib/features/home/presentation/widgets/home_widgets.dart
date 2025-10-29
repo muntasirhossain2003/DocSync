@@ -1,10 +1,13 @@
 // lib/features/home/presentation/widgets/home_widgets.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../../core/theme/app_constants.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../video_call/domain/models/call_state.dart';
@@ -70,26 +73,43 @@ class HomeHeader extends ConsumerWidget {
             ],
           ),
         ),
-        IconButton(icon: const Icon(Icons.search, size: 28), onPressed: () {}),
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.green[50],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.notifications_none, color: Colors.green),
-        ),
       ],
     );
   }
 }
 
-class UpcomingScheduleSection extends ConsumerWidget {
+class UpcomingScheduleSection extends ConsumerStatefulWidget {
   const UpcomingScheduleSection({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UpcomingScheduleSection> createState() =>
+      _UpcomingScheduleSectionState();
+}
+
+class _UpcomingScheduleSectionState
+    extends ConsumerState<UpcomingScheduleSection> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Start a timer to refresh consultations every minute for real-time updates
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      if (mounted) {
+        // Refresh the consultation provider to update button states
+        ref.invalidate(upcomingConsultationsProvider);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final consultationsAsync = ref.watch(upcomingConsultationsProvider);
 
     return Column(
@@ -411,66 +431,16 @@ class AppointmentCard extends StatelessWidget {
   }
 
   Widget _buildJoinCallButton(BuildContext context) {
-    // Check if consultation is within joining window
-    // Convert both times to UTC for consistent comparison
-    final now = DateTime.now().toUtc();
-    final scheduledTime = consultation.scheduledTime.toUtc();
-    final difference = scheduledTime.difference(now);
-
-    // Can join if:
-    // - Within 15 minutes BEFORE scheduled time (difference is positive and <= 15)
-    // - Up to 30 minutes AFTER scheduled time (difference is negative and >= -30)
-    final canJoin = difference.inMinutes <= 15 && difference.inMinutes >= -30;
-
     if (consultation.consultationType != 'video') {
       return const SizedBox.shrink();
     }
 
-    // Get user-friendly message
-    String buttonText;
-    if (canJoin) {
-      buttonText = 'Join Video Call';
-    } else if (difference.inMinutes > 15) {
-      // Too early - more than 15 minutes before
-      final minutesUntil = difference.inMinutes;
-
-      // Format time remaining in user-friendly way
-      if (minutesUntil > 1440) {
-        // More than 24 hours - show days
-        final days = (minutesUntil / 1440).floor();
-        buttonText = 'Available in ${days}d';
-      } else if (minutesUntil > 60) {
-        // More than 1 hour - show hours
-        final hours = (minutesUntil / 60).floor();
-        buttonText = 'Available in ${hours}h';
-      } else {
-        // Less than 1 hour - show minutes
-        buttonText = 'Available in ${minutesUntil}m';
-      }
-    } else {
-      // Too late - more than 30 minutes after
-      buttonText = 'Call Ended';
-    }
-
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: canJoin ? () => _joinVideoCall(context) : null,
-        icon: Icon(canJoin ? Icons.video_call : Icons.schedule, size: 18),
-        label: Text(
-          buttonText,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: canJoin
-              ? Colors.white
-              : Colors.white.withOpacity(0.5),
-          foregroundColor: canJoin ? color : Colors.grey,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
+      child: RealTimeCallButton(
+        consultation: consultation,
+        color: color,
+        onJoinCall: () => _joinVideoCall(context),
       ),
     );
   }
@@ -1062,4 +1032,75 @@ String _formatSpecializationLabel(String specialization) {
   }
 
   return label;
+}
+
+// Real-time call button with live countdown updates
+class RealTimeCallButton extends StatefulWidget {
+  final ConsultationWithDoctor consultation;
+  final Color color;
+  final VoidCallback onJoinCall;
+
+  const RealTimeCallButton({
+    super.key,
+    required this.consultation,
+    required this.color,
+    required this.onJoinCall,
+  });
+
+  @override
+  State<RealTimeCallButton> createState() => _RealTimeCallButtonState();
+}
+
+class _RealTimeCallButtonState extends State<RealTimeCallButton> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Update every 30 seconds for more responsive UI
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        setState(() {
+          // This will trigger a rebuild with updated time calculations
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canJoin = widget.consultation.isVideoCallAvailable;
+    final buttonText = widget.consultation.callStatusText;
+
+    // Determine icon based on consultation state
+    IconData buttonIcon;
+    if (canJoin) {
+      buttonIcon = Icons.video_call;
+    } else if (widget.consultation.timeUntilAvailable != null) {
+      buttonIcon = Icons.schedule;
+    } else {
+      buttonIcon = Icons.call_end;
+    }
+
+    return ElevatedButton.icon(
+      onPressed: canJoin ? widget.onJoinCall : null,
+      icon: Icon(buttonIcon, size: 18),
+      label: Text(
+        buttonText,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: canJoin ? Colors.white : Colors.white.withOpacity(0.5),
+        foregroundColor: canJoin ? widget.color : Colors.grey,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 }

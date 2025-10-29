@@ -254,7 +254,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                       'Proceed to Checkout',
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimary,
+                        color: colorScheme.surface,
                       ),
                     ),
                   ),
