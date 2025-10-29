@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_constants.dart';
 import '../../../consult/domain/models/doctor.dart';
+import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../domain/models/consultation.dart';
 import '../providers/booking_provider.dart';
 import '../widgets/date_selector_widget.dart';
@@ -68,8 +69,10 @@ class _BookingPageState extends ConsumerState<BookingPage> {
 
     ref.read(consultationNotesProvider.notifier).state = notes;
 
-    // Create the consultation
-    _createBooking(selectedSlot.dateTime, consultationType, notes);
+    // Create the consultation using the canonical UTC instant of the slot
+    final utcInstant =
+        selectedSlot.utcDateTime ?? selectedSlot.dateTime.toUtc();
+    _createBooking(utcInstant, consultationType, notes);
   }
 
   Future<void> _createBooking(
@@ -87,6 +90,8 @@ class _BookingPageState extends ConsumerState<BookingPage> {
         );
 
     if (consultation != null && mounted) {
+      // Immediately refresh upcoming consultations so Home reflects the new booking
+      ref.invalidate(upcomingConsultationsProvider);
       // Navigate to checkout page
       context.push('/booking/checkout', extra: consultation);
     } else if (mounted) {
@@ -249,7 +254,7 @@ class _BookingPageState extends ConsumerState<BookingPage> {
                       'Proceed to Checkout',
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimary,
+                        color: colorScheme.surface,
                       ),
                     ),
                   ),

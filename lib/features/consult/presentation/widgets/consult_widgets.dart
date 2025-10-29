@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/theme.dart';
 import '../../../home/presentation/providers/consultation_provider.dart';
-import '../../../video_call/domain/models/call_state.dart';
 import '../../data/repositories/doctor_repository.dart';
 import '../../domain/models/doctor.dart';
 import '../providers/doctor_provider.dart';
@@ -74,6 +73,8 @@ class ConsultSearchBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedSpecializationProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -91,7 +92,9 @@ class ConsultSearchBar extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: AppColors.light_blue,
+                fillColor: isDark
+                    ? colorScheme.surfaceContainerHighest
+                    : AppColors.light_blue,
               ),
             ),
           ),
@@ -99,16 +102,22 @@ class ConsultSearchBar extends ConsumerWidget {
           Container(
             height: 56,
             decoration: BoxDecoration(
-              color: selected != null ? Colors.indigo : Colors.grey.shade50,
+              color: selected != null
+                  ? Colors.indigo
+                  : (isDark
+                        ? colorScheme.surfaceContainerHighest
+                        : Colors.grey.shade50),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: selected != null ? Colors.indigo : Colors.grey.shade300,
+                color: selected != null
+                    ? Colors.indigo
+                    : (isDark ? colorScheme.outline : Colors.grey.shade300),
               ),
             ),
             child: IconButton(
               icon: Icon(
                 Icons.filter_list,
-                color: selected != null ? Colors.white : Colors.grey.shade700,
+                color: selected != null ? Colors.white : colorScheme.onSurface,
               ),
               onPressed: () => _showFilterSheet(context, ref),
               tooltip: 'Filter by specialization',
@@ -155,14 +164,20 @@ class DoctorList extends ConsumerWidget {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: doctors.length,
-            separatorBuilder: (_, __) => const Divider(height: 24),
-            itemBuilder: (context, index) {
-              final doctor = doctors[index];
-              return DoctorCard(doctor: doctor);
+          return RefreshIndicator(
+            onRefresh: () async {
+              final future = ref.refresh(filteredDoctorsProvider.future);
+              await future;
             },
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: doctors.length,
+              separatorBuilder: (_, __) => const Divider(height: 24),
+              itemBuilder: (context, index) {
+                final doctor = doctors[index];
+                return DoctorCard(doctor: doctor);
+              },
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -333,31 +348,17 @@ class DoctorCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const Spacer(),
 
                 // Action Buttons
                 OutlinedButton.icon(
                   onPressed: () => _bookConsultation(context, doctor),
                   icon: const Icon(Icons.calendar_today, size: 16),
-                  label: const Text('Book'),
+                  label: const Text('Book Now'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                ElevatedButton.icon(
-                  onPressed: doctor.isAvailableNow
-                      ? () => _instantCall(context, doctor)
-                      : null,
-                  icon: const Icon(Icons.video_call, size: 16),
-                  label: const Text('Call'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                   ),
                 ),
@@ -372,21 +373,6 @@ class DoctorCard extends StatelessWidget {
   void _bookConsultation(BuildContext context, Doctor doctor) {
     // Navigate to booking page
     context.push('/booking', extra: doctor);
-  }
-
-  void _instantCall(BuildContext context, Doctor doctor) {
-    // Create a temporary consultation for instant call
-    final callInfo = VideoCallInfo(
-      consultationId: 'instant_${DateTime.now().millisecondsSinceEpoch}',
-      doctorId: doctor.id,
-      doctorName: doctor.fullName,
-      doctorProfileUrl: doctor.profilePictureUrl,
-      patientId: '',
-      patientName: '',
-      scheduledTime: DateTime.now(),
-    );
-
-    context.push('/video-call', extra: callInfo);
   }
 
   bool _isValidImageUrl(String? url) {

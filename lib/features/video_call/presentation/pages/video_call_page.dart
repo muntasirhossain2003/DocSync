@@ -2,6 +2,7 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/config/agora_config.dart';
 import '../../domain/models/call_state.dart';
 import '../providers/video_call_provider.dart';
@@ -89,7 +90,12 @@ class _VideoCallPageState extends ConsumerState<VideoCallPage> {
   }
 
   Widget _buildRemoteVideo(VideoCallController controller, CallState state) {
-    if (controller.remoteUid == null) {
+    // Show remote video if we have a remote UID or if we're connected (audio might be working)
+    final bool hasRemoteConnection =
+        controller.remoteUid != null ||
+        (state == CallState.connected && controller.engine != null);
+
+    if (!hasRemoteConnection) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -115,9 +121,9 @@ class _VideoCallPageState extends ConsumerState<VideoCallPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              state == CallState.connected
-                  ? 'Waiting for doctor to join...'
-                  : 'Connecting...',
+              state == CallState.connecting
+                  ? 'Connecting...'
+                  : 'Waiting for doctor to join...',
               style: TextStyle(color: Colors.grey[400], fontSize: 16),
             ),
           ],
@@ -125,15 +131,67 @@ class _VideoCallPageState extends ConsumerState<VideoCallPage> {
       );
     }
 
-    return controller.engine != null
-        ? AgoraVideoView(
+    // Try to show remote video
+    if (controller.engine != null) {
+      return Stack(
+        children: [
+          // Remote video view
+          AgoraVideoView(
             controller: VideoViewController.remote(
               rtcEngine: controller.engine!,
-              canvas: VideoCanvas(uid: controller.remoteUid),
+              canvas: VideoCanvas(
+                uid: controller.remoteUid,
+                renderMode: RenderModeType.renderModeHidden,
+                mirrorMode: VideoMirrorModeType.videoMirrorModeDisabled,
+              ),
               connection: RtcConnection(channelId: AgoraConfig.channelName),
             ),
-          )
-        : const Center(child: CircularProgressIndicator());
+          ),
+          // Fallback overlay if video isn't rendering (show when we have connection but no visible video)
+          if (controller.remoteUid == null)
+            Container(
+              color: Colors.black54,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey[800],
+                      backgroundImage: widget.callInfo.doctorProfileUrl != null
+                          ? NetworkImage(widget.callInfo.doctorProfileUrl!)
+                          : null,
+                      child: widget.callInfo.doctorProfileUrl == null
+                          ? const Icon(
+                              Icons.person,
+                              size: 40,
+                              color: Colors.white,
+                            )
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '${widget.callInfo.doctorName}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Audio connected • Video loading...',
+                      style: TextStyle(color: Colors.grey[300], fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+
+    return const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildLocalVideo(VideoCallController controller) {

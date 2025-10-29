@@ -14,7 +14,11 @@ import '../../features/consult/domain/models/doctor.dart';
 import '../../features/consult/presentation/pages/consult_page.dart';
 import '../../features/health/presentation/pages/health_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/profile/presentation/pages/help_support_page.dart';
+import '../../features/profile/presentation/pages/privacy_policy_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/settings_page.dart';
+import '../../features/profile/presentation/pages/terms_of_service_page.dart';
 import '../../features/subscription/domain/entities/subscription_plan.dart';
 import '../../features/subscription/pages/checkout_page.dart' as sub_checkout;
 import '../../features/subscription/pages/subscription_page.dart';
@@ -81,7 +85,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return VideoCallPage(callInfo: callInfo);
         },
       ),
-  
 
       // Booking Route (outside shell - no bottom navigation)
       GoRoute(
@@ -170,6 +173,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         ],
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: 'settings',
+                    builder: (context, state) => const SettingsPage(),
+                  ),
+                  GoRoute(
+                    path: 'privacy-policy',
+                    builder: (context, state) => const PrivacyPolicyPage(),
+                  ),
+                  GoRoute(
+                    path: 'terms-of-service',
+                    builder: (context, state) => const TermsOfServicePage(),
+                  ),
+                  GoRoute(
+                    path: 'help-support',
+                    builder: (context, state) => const HelpSupportPage(),
                   ),
                 ],
               ),

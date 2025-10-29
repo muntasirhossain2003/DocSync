@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/providers/locale_provider.dart';
 import '../../../../features/home/presentation/providers/user_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/profile_image_picker.dart';
 
 class ProfileHeader extends ConsumerWidget {
@@ -27,10 +29,12 @@ class ProfileHeader extends ConsumerWidget {
               ref.invalidate(currentUserProvider);
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile picture updated!'),
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)!.profilePictureUpdated,
+                  ),
                   backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -53,41 +57,124 @@ class ProfileHeader extends ConsumerWidget {
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
-        const SizedBox(height: 12),
-        OutlinedButton(onPressed: () {
-          context.push('/profile/subscription');
-        }, child: const Text('Manage Plan')),
       ],
     );
   }
 }
 
-class ProfileList extends StatelessWidget {
+class ProfileList extends ConsumerWidget {
   const ProfileList({super.key});
 
+  void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.read(localeProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(l10n.selectLanguage),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: Text(l10n.english),
+                value: 'en',
+                groupValue: currentLocale.languageCode,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    ref.read(localeProvider.notifier).setLocale(Locale(value));
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.languageChangedToEnglish),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: Text(l10n.bangla),
+                value: 'bn',
+                groupValue: currentLocale.languageCode,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    ref.read(localeProvider.notifier).setLocale(Locale(value));
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.languageChangedToEnglish),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancel),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return const Column(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final languageName = ref.watch(localeProvider.notifier).getLanguageName();
+
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
       children: [
-        ListTile(leading: Icon(Icons.group), title: Text('Family Members')),
-        Divider(),
         ListTile(
-          leading: Icon(Icons.workspace_premium),
-          title: Text('Subscriptions & Care Plans'),
-        ),
-        ListTile(leading: Icon(Icons.language), title: Text('Language')),
-        ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
-        Divider(),
-        ListTile(
-          leading: Icon(Icons.privacy_tip),
-          title: Text('Privacy Policy'),
+          leading: const Icon(Icons.workspace_premium),
+          title: Text(l10n.subscriptionsAndCarePlans),
+          onTap: () {
+            context.push('/profile/subscription');
+          },
         ),
         ListTile(
-          leading: Icon(Icons.description),
-          title: Text('Terms of Service'),
+          leading: const Icon(Icons.language),
+          title: Text(l10n.language),
+          subtitle: Text(languageName),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          onTap: () => _showLanguageDialog(context, ref),
         ),
-        ListTile(leading: Icon(Icons.help), title: Text('Help & Support')),
+        ListTile(
+          leading: const Icon(Icons.settings),
+          title: Text(l10n.settings),
+          onTap: () {
+            context.push('/profile/settings');
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.privacy_tip),
+          title: Text(l10n.privacyPolicy),
+          onTap: () {
+            context.push('/profile/privacy-policy');
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.description),
+          title: Text(l10n.termsOfService),
+          onTap: () {
+            context.push('/profile/terms-of-service');
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.help),
+          title: Text(l10n.helpAndSupport),
+          onTap: () {
+            context.push('/profile/help-support');
+          },
+        ),
       ],
     );
   }
@@ -107,7 +194,7 @@ class SignOutButton extends StatelessWidget {
         }
       },
       icon: const Icon(Icons.logout),
-      label: const Text('Sign out'),
+      label: Text(AppLocalizations.of(context)!.signOut),
     );
   }
 }

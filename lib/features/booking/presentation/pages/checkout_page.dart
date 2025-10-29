@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_constants.dart';
+import '../../../home/presentation/providers/consultation_provider.dart';
 import '../../domain/models/consultation.dart';
 import '../../domain/models/payment_method.dart';
 import '../providers/booking_provider.dart';
@@ -95,6 +96,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             onPressed: () {
               // Close dialog and navigate to home
               Navigator.of(context).pop();
+              // Ensure upcoming schedule is refreshed on Home
+              ref.invalidate(upcomingConsultationsProvider);
               context.go('/home');
             },
             child: const Text('Done'),
@@ -495,38 +498,44 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                   ),
                 ),
               SizedBox(height: AppConstants.spacingMD),
-              ElevatedButton(
-                onPressed: _isProcessing || _selectedPaymentMethod == null
-                    ? null
-                    : _processPayment,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    vertical: AppConstants.spacingMD,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isProcessing || _selectedPaymentMethod == null
+                      ? null
+                      : _processPayment,
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.spacingLG,
+                    ),
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppConstants.radiusMD,
+                      ),
+                    ),
                   ),
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-                  ),
-                ),
-                child: _isProcessing
-                    ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            colorScheme.onPrimary,
+                  child: _isProcessing
+                      ? SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              colorScheme.onPrimary,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          'Confirm Payment',
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.surface,
+                            fontSize: 16,
                           ),
                         ),
-                      )
-                    : Text(
-                        'Confirm Payment',
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimary,
-                        ),
-                      ),
+                ),
               ),
             ],
           ),
@@ -567,36 +576,42 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               ],
             ),
             SizedBox(height: AppConstants.spacingMD),
-            ElevatedButton(
-              onPressed: _isProcessing || _selectedPaymentMethod == null
-                  ? null
-                  : _processPayment,
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: AppConstants.spacingMD),
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isProcessing || _selectedPaymentMethod == null
+                    ? null
+                    : _processPayment,
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingLG,
+                  ),
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                  ),
                 ),
-              ),
-              child: _isProcessing
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          colorScheme.onPrimary,
+                child: _isProcessing
+                    ? SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            colorScheme.onPrimary,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        'Confirm Payment',
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimary,
+                          fontSize: 16,
                         ),
                       ),
-                    )
-                  : Text(
-                      'Confirm Payment',
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
+              ),
             ),
           ],
         ),

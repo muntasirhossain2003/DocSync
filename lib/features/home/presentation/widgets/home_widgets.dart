@@ -1,4 +1,6 @@
 // lib/features/home/presentation/widgets/home_widgets.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,8 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/app_constants.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../video_call/domain/models/call_state.dart';
 import '../pages/all_categories_page.dart';
+import '../pages/all_top_doctors_page.dart';
 import '../pages/doctors_by_specialty_page.dart';
 import '../providers/consultation_provider.dart';
 import '../providers/user_provider.dart';
@@ -50,17 +54,18 @@ class HomeHeader extends ConsumerWidget {
             children: [
               userAsync.when(
                 data: (user) => Text(
-                  'Hi, ${user?.firstName ?? 'User'}',
+                  '${AppLocalizations.of(context)!.hi}, ${user?.firstName ?? 'User'}',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 loading: () => const Text('Loading...'),
-                error: (_, __) => const Text('Hi, User'),
+                error: (_, __) =>
+                    Text('${AppLocalizations.of(context)!.hi}, User'),
               ),
               Text(
-                'How is your health?',
+                AppLocalizations.of(context)!.howIsYourHealth,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -68,26 +73,43 @@ class HomeHeader extends ConsumerWidget {
             ],
           ),
         ),
-        IconButton(icon: const Icon(Icons.search, size: 28), onPressed: () {}),
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.green[50],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.notifications_none, color: Colors.green),
-        ),
       ],
     );
   }
 }
 
-class UpcomingScheduleSection extends ConsumerWidget {
+class UpcomingScheduleSection extends ConsumerStatefulWidget {
   const UpcomingScheduleSection({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UpcomingScheduleSection> createState() =>
+      _UpcomingScheduleSectionState();
+}
+
+class _UpcomingScheduleSectionState
+    extends ConsumerState<UpcomingScheduleSection> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Start a timer to refresh consultations every minute for real-time updates
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      if (mounted) {
+        // Refresh the consultation provider to update button states
+        ref.invalidate(upcomingConsultationsProvider);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final consultationsAsync = ref.watch(upcomingConsultationsProvider);
 
     return Column(
@@ -96,16 +118,16 @@ class UpcomingScheduleSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Upcoming Schedule',
+              AppLocalizations.of(context)!.upcomingSchedule,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text(
-                'See All',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context)!.seeAll,
+                style: const TextStyle(
                   color: Color(0xFF4A90E2),
                   fontWeight: FontWeight.w500,
                 ),
@@ -134,7 +156,7 @@ class UpcomingScheduleSection extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'No upcoming appointments',
+                        AppLocalizations.of(context)!.noUpcomingSchedule,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -409,66 +431,16 @@ class AppointmentCard extends StatelessWidget {
   }
 
   Widget _buildJoinCallButton(BuildContext context) {
-    // Check if consultation is within joining window
-    // Convert both times to UTC for consistent comparison
-    final now = DateTime.now().toUtc();
-    final scheduledTime = consultation.scheduledTime.toUtc();
-    final difference = scheduledTime.difference(now);
-
-    // Can join if:
-    // - Within 15 minutes BEFORE scheduled time (difference is positive and <= 15)
-    // - Up to 30 minutes AFTER scheduled time (difference is negative and >= -30)
-    final canJoin = difference.inMinutes <= 15 && difference.inMinutes >= -30;
-
     if (consultation.consultationType != 'video') {
       return const SizedBox.shrink();
     }
 
-    // Get user-friendly message
-    String buttonText;
-    if (canJoin) {
-      buttonText = 'Join Video Call';
-    } else if (difference.inMinutes > 15) {
-      // Too early - more than 15 minutes before
-      final minutesUntil = difference.inMinutes;
-
-      // Format time remaining in user-friendly way
-      if (minutesUntil > 1440) {
-        // More than 24 hours - show days
-        final days = (minutesUntil / 1440).floor();
-        buttonText = 'Available in ${days}d';
-      } else if (minutesUntil > 60) {
-        // More than 1 hour - show hours
-        final hours = (minutesUntil / 60).floor();
-        buttonText = 'Available in ${hours}h';
-      } else {
-        // Less than 1 hour - show minutes
-        buttonText = 'Available in ${minutesUntil}m';
-      }
-    } else {
-      // Too late - more than 30 minutes after
-      buttonText = 'Call Ended';
-    }
-
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: canJoin ? () => _joinVideoCall(context) : null,
-        icon: Icon(canJoin ? Icons.video_call : Icons.schedule, size: 18),
-        label: Text(
-          buttonText,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: canJoin
-              ? Colors.white
-              : Colors.white.withOpacity(0.5),
-          foregroundColor: canJoin ? color : Colors.grey,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
+      child: RealTimeCallButton(
+        consultation: consultation,
+        color: color,
+        onJoinCall: () => _joinVideoCall(context),
       ),
     );
   }
@@ -513,6 +485,7 @@ class CategoriesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       children: [
@@ -520,7 +493,7 @@ class CategoriesSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Categories',
+              AppLocalizations.of(context)!.categories,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -528,7 +501,7 @@ class CategoriesSection extends ConsumerWidget {
             TextButton(
               onPressed: () => _showAllCategories(context),
               child: Text(
-                'See All',
+                AppLocalizations.of(context)!.seeAll,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
@@ -537,51 +510,57 @@ class CategoriesSection extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 6),
         categoriesAsync.when(
           data: (categories) {
             if (categories.isEmpty) {
               return Container(
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
                   child: Text(
                     'No categories available',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
                 ),
               );
             }
 
-            return SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length > 8 ? 8 : categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: GestureDetector(
-                      onTap: () => _showDoctorsBySpecialty(context, category),
-                      child: CategoryCard(
-                        icon: category.icon,
-                        label: category.label,
-                        color: category.color,
-                      ),
-                    ),
-                  );
-                },
+            // Show only first 6 categories in 2x3 grid
+            final displayCategories = categories.take(6).toList();
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
+              itemCount: displayCategories.length,
+              itemBuilder: (context, index) {
+                final category = displayCategories[index];
+                return GestureDetector(
+                  onTap: () => _showDoctorsBySpecialty(context, category),
+                  child: CategoryCard(
+                    icon: category.icon,
+                    label: category.label,
+                    color: category.color,
+                  ),
+                );
+              },
             );
           },
           loading: () => Container(
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(child: CircularProgressIndicator()),
@@ -589,7 +568,7 @@ class CategoriesSection extends ConsumerWidget {
           error: (error, stack) => Container(
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.red[50],
+              color: Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
@@ -626,38 +605,34 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 80,
-      height: 100,
-      child: Column(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Center(child: Icon(icon, color: color, size: 28)),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 55,
+          height: 55,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
           ),
-          const SizedBox(height: 6),
-          SizedBox(
-            height: 32, // Fixed height for text area
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
-                height: 1.1,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+          child: Center(child: Icon(icon, color: color, size: 28)),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
+            height: 1.2,
           ),
-        ],
-      ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }
@@ -673,15 +648,22 @@ class TopDoctorsSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Top Doctors',
+              AppLocalizations.of(context)!.topDoctors,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AllTopDoctorsPage(),
+                  ),
+                );
+              },
               child: Text(
-                'See All',
+                AppLocalizations.of(context)!.seeAll,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
@@ -733,14 +715,17 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -752,7 +737,7 @@ class DoctorCard extends StatelessWidget {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD),
+              color: colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: ClipRRect(
@@ -763,20 +748,20 @@ class DoctorCard extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: const Color(0xFFE3F2FD),
-                          child: const Icon(
+                          color: colorScheme.primaryContainer,
+                          child: Icon(
                             Icons.person,
-                            color: Colors.blue,
+                            color: colorScheme.primary,
                             size: 35,
                           ),
                         );
                       },
                     )
                   : Container(
-                      color: const Color(0xFFE3F2FD),
-                      child: const Icon(
+                      color: colorScheme.primaryContainer,
+                      child: Icon(
                         Icons.person,
-                        color: Colors.blue,
+                        color: colorScheme.primary,
                         size: 35,
                       ),
                     ),
@@ -789,16 +774,19 @@ class DoctorCard extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$specialty • $hospital',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colorScheme.onSurface.withOpacity(0.6),
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -810,20 +798,23 @@ class DoctorCard extends StatelessWidget {
                         size: 14,
                         color: index < rating.floor()
                             ? Colors.amber
-                            : Colors.grey[300],
+                            : colorScheme.onSurface.withOpacity(0.3),
                       ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       '($reviews)',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          const Icon(Icons.more_vert, color: Colors.grey),
+          Icon(Icons.more_vert, color: colorScheme.onSurface.withOpacity(0.5)),
         ],
       ),
     );
@@ -1041,4 +1032,75 @@ String _formatSpecializationLabel(String specialization) {
   }
 
   return label;
+}
+
+// Real-time call button with live countdown updates
+class RealTimeCallButton extends StatefulWidget {
+  final ConsultationWithDoctor consultation;
+  final Color color;
+  final VoidCallback onJoinCall;
+
+  const RealTimeCallButton({
+    super.key,
+    required this.consultation,
+    required this.color,
+    required this.onJoinCall,
+  });
+
+  @override
+  State<RealTimeCallButton> createState() => _RealTimeCallButtonState();
+}
+
+class _RealTimeCallButtonState extends State<RealTimeCallButton> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Update every 30 seconds for more responsive UI
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        setState(() {
+          // This will trigger a rebuild with updated time calculations
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canJoin = widget.consultation.isVideoCallAvailable;
+    final buttonText = widget.consultation.callStatusText;
+
+    // Determine icon based on consultation state
+    IconData buttonIcon;
+    if (canJoin) {
+      buttonIcon = Icons.video_call;
+    } else if (widget.consultation.timeUntilAvailable != null) {
+      buttonIcon = Icons.schedule;
+    } else {
+      buttonIcon = Icons.call_end;
+    }
+
+    return ElevatedButton.icon(
+      onPressed: canJoin ? widget.onJoinCall : null,
+      icon: Icon(buttonIcon, size: 18),
+      label: Text(
+        buttonText,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: canJoin ? Colors.white : Colors.white.withOpacity(0.5),
+        foregroundColor: canJoin ? widget.color : Colors.grey,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 }

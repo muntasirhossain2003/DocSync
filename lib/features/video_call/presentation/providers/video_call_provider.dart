@@ -56,6 +56,50 @@ class VideoCallController extends StateNotifier<CallState> {
             // Update status to in_progress when both users are in the call
             _updateConsultationStatus(status: 'in_progress');
           },
+          onRemoteVideoStateChanged:
+              (
+                RtcConnection connection,
+                int remoteUid,
+                RemoteVideoState state,
+                RemoteVideoStateReason reason,
+                int elapsed,
+              ) {
+                print(
+                  '📹 Remote video state changed: UID=$remoteUid, State=$state, Reason=$reason',
+                );
+                if (state == RemoteVideoState.remoteVideoStateStarting ||
+                    state == RemoteVideoState.remoteVideoStateDecoding) {
+                  if (_remoteUid == null) {
+                    print('🔄 Setting remote UID from video state: $remoteUid');
+                    _remoteUid = remoteUid;
+                    this.state = CallState.connected;
+                  }
+                }
+                // Force UI refresh when video state changes
+                refreshState();
+              },
+          onRemoteAudioStateChanged:
+              (
+                RtcConnection connection,
+                int remoteUid,
+                RemoteAudioState state,
+                RemoteAudioStateReason reason,
+                int elapsed,
+              ) {
+                print(
+                  '🔊 Remote audio state changed: UID=$remoteUid, State=$state, Reason=$reason',
+                );
+                if (state == RemoteAudioState.remoteAudioStateStarting ||
+                    state == RemoteAudioState.remoteAudioStateDecoding) {
+                  if (_remoteUid == null) {
+                    print('🔄 Setting remote UID from audio state: $remoteUid');
+                    _remoteUid = remoteUid;
+                    this.state = CallState.connected;
+                  }
+                }
+                // Force UI refresh when audio state changes
+                refreshState();
+              },
           onUserOffline:
               (
                 RtcConnection connection,
@@ -153,6 +197,11 @@ class VideoCallController extends StateNotifier<CallState> {
     state = CallState.disconnected;
     // Update status to completed when call ends
     await _updateConsultationStatus(status: 'completed');
+  }
+
+  // Force UI refresh - useful when remote state changes
+  void refreshState() {
+    state = state; // This triggers notifyListeners
   }
 
   /// Update consultation status in database

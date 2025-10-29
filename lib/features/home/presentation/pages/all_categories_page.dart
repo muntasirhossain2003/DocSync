@@ -11,19 +11,23 @@ class AllCategoriesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'All Categories',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: categoriesAsync.when(
@@ -36,12 +40,15 @@ class AllCategoriesPage extends ConsumerWidget {
                   Icon(
                     Icons.category_outlined,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: colorScheme.onSurface.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No categories available',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
                   ),
                 ],
               ),

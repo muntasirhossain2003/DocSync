@@ -64,6 +64,13 @@ class AgoraService {
     try {
       print('📞 Joining Agora channel: $channelName with UID: $uid');
 
+      // Ensure audio and video are enabled before joining
+      await _engine!.enableAudio();
+      await _engine!.enableVideo();
+
+      // Start preview to ensure local video is working
+      await _engine!.startPreview();
+
       await _engine!.joinChannel(
         token: token,
         channelId: channelName,
@@ -75,6 +82,9 @@ class AgoraService {
           autoSubscribeVideo: true,
           publishCameraTrack: true,
           publishMicrophoneTrack: true,
+          // Ensure we subscribe to remote video and audio
+          publishCustomAudioTrack: false,
+          publishCustomVideoTrack: false,
         ),
       );
 
@@ -87,6 +97,7 @@ class AgoraService {
 
   Future<void> leaveChannel() async {
     if (_engine == null) return;
+    await _engine!.stopPreview();
     await _engine!.leaveChannel();
   }
 
